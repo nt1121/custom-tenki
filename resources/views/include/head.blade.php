@@ -1,0 +1,7 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CustomTenki</title>
+<meta name=”description” content=”表示する項目などがカスタマイズできる天気予報です。”>
+<meta name=”keywords” content=”天気,天気予報”>
+<link rel="stylesheet" href="{{ asset('css/sanitize.css') }}">
+@vite('resources/scss/app.scss')
