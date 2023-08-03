@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TopController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,3 +16,15 @@ use App\Http\Controllers\TopController;
 */
 
 Route::get('/',  [TopController::class, 'index']);
+Route::get('/login',  [AuthController::class, 'showLoginPage'])->name('login');
+Route::post('/login',  [AuthController::class, 'login']);
+Route::post('/logout',  [AuthController::class, 'logout']);
+Route::get('/register',  [AuthController::class, 'showRegisterPage']);
+Route::post('/register',  [AuthController::class, 'register']);
+Route::get('/register/verify/{token}', [AuthController::class, 'verifyUserRegistrationToken']);
+
+Route::middleware(['auth', 'verified:login'])->group(function () {
+    Route::prefix('api')->group(function () {
+
+    });
+});

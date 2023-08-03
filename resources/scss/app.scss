@@ -31,11 +31,11 @@ $input-text-border-color-danger: #ff3333;
 $loading-circle-border-color: #fff;
 $spa-loading-circle-border-color: #666;
 $header-bg-color: #fff;
-$header-border-color: #fff;
+$header-border-color: #ccc;
 $header-link-color: #333;
 $header-link-color-hover: #999;
 $table-border-color: #666;
-$footer-bg-color: #ccc;
+$footer-bg-color: #eee;
 $footer-color: #333;
 $footer-link-color: #333;
 $footer-bg-color-top: #000;
@@ -280,7 +280,6 @@ a {
     }
     
     &__input-password-eye-icon-line {
-        display: none;
         position: absolute;
         top: 19px;
         right: 5px;
@@ -289,10 +288,6 @@ a {
         background-color: $color;
         transform: rotate(45deg);
         pointer-events: none;
-
-        &--active {
-            display: block;
-        }
     }
     
     &__input-checkbox {
@@ -413,8 +408,11 @@ a {
         line-height: 24px;
         text-decoration: none;
         color: $header-link-color;
-        /* $font-color */
         transition: color 0.3s;
+        border: none;
+        background: none;
+        font-size: 16px;
+        cursor: pointer;
 
         &:hover {
             color: $header-link-color-hover;
@@ -813,6 +811,8 @@ a {
     transform: translateX(-50%);
     border-radius: 3px;
     text-align: center;
+    animation: alert-message-fadeout 4s linear 0s;
+    opacity: 0;
 
     &--success {
         background-color: $alert-bg-color-success;
@@ -820,11 +820,6 @@ a {
     
     &--error {
         background-color: $alert-bg-color-danger;
-    }
-    
-    &--fading-out {
-        opacity: 0;
-        animation: alert-message-fadeout 4s linear 0s;
     }
     
     &__close-button {
@@ -885,30 +880,26 @@ a {
     background-color: $header-bg-color;
     padding-top: 51px;
 
-    &--active {
-        @include mq(sp) {
-            animation: hamburger-menu-fadein 0.3s linear 0s;
-            display: block;
-        }
-    }
-
-    &--fading-out {
-        @include mq(sp) {
-            display: block;
-            opacity: 0;
-            animation: hamburger-menu-fadeout 0.3s linear 0s;
-        }
+    @include mq(sp) {
+        display: block;
     }
 
     &__link {
         display: block;
         height: 51px;
+        border-top: none;
+        border-right: none;
+        border-left: none;
         border-bottom: 1px solid $header-border-color;
         color: $color;
         text-decoration: none;
         text-align: center;
         line-height: 50px;
         font-weight: bold;
+        background: none;
+        font-size: 16px;
+        width: 100%;
+        cursor: pointer;
     
         &:hover {
             color: $header-link-color-hover;
@@ -919,6 +910,10 @@ a {
 /* Utility ------------ */
 
 /* Margin */
+
+.u-m-0 {
+    margin: 0;
+}
 
 .u-mr-0 {
     margin-right: 0;
@@ -956,4 +951,16 @@ a {
 
 .u-text-center {
     text-align: center;
+}
+
+/* Fade */
+
+.u-fade-hamburger-menu-enter-active,
+.u-fade-hamburger-menu-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.u-fade-hamburger-menu-enter-from,
+.u-fade-hamburger-menu-leave-to {
+  opacity: 0;
 }
