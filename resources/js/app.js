@@ -6,6 +6,8 @@ import LoginForm from './Components/LoginForm.vue';
 import RegisterForm from './Components/RegisterForm.vue';
 import AlertMessage from './Components/AlertMessage.vue';
 import PageLoading from './Components/PageLoading.vue';
+import PasswordResetRequest from './Components/PasswordResetRequest.vue';
+import PasswordReset from './Components/PasswordReset.vue';
 
 const app = createApp({
     data() {
@@ -26,11 +28,14 @@ const app = createApp({
             }, 200);
         }
     },
-})
+});
+
 app.component('input-password', InputPassword)
     .component('login-form', LoginForm)
     .component('register-form', RegisterForm)
     .component('alert-message', AlertMessage)
     .component('page-loading', PageLoading)
+    .component('password-reset-request', PasswordResetRequest)
+    .component('password-reset', PasswordReset)
     .use(store)
-    .mount('#app')
+    .mount('#app');

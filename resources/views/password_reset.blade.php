@@ -11,11 +11,7 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <register-form old-email="{{ old('email', '') }}"
-                    :old-agree-to-terms-of-use="{{ old('agree_to_terms_of_use') ? 'true' : 'false' }}"
-                    :old-consent-to-privacy-policy="{{ old('consent_to_privacy_policy') ? 'true' : 'false' }}"
-                    email-initial-error-msg="{{ $errors->first('email') }}"
-                    password-initial-error-msg="{{ $errors->first('password') }}"></register-form>
+                <password-reset password-initial-error-msg="{{ $errors->first('password') }}" token="{{ $token }}"></password-reset>
             </div>
         </main>
         @include('include.footer')

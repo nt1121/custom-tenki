@@ -14,4 +14,20 @@ class TopController extends Controller
     {
         return view('top');
     }
+
+    /**
+     * 利用規約の表示
+     */
+    public function showTermsOfServicePage(): View
+    {
+        return view('terms');
+    }
+
+    /**
+     * プライバシーポリシーの表示
+     */
+    public function showPrivacyPolicyPage(): View
+    {
+        return view('privacy');
+    }
 }

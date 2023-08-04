@@ -16,8 +16,7 @@
                         <button type="submit" class="c-button c-button--primary p-top__button">テストユーザーとしてログイン</button>
                     </form>
                     <div class="p-top__button-wrapper">
-                        <a href="/login"
-                            class="c-button c-button--primary p-top__button">ログイン</a>
+                        <a href="/login" class="c-button c-button--primary p-top__button">ログイン</a>
                     </div>
                     <div class="p-top__button-wrapper u-mb-0">
                         <a href="/register" class="c-button c-button--primary p-top__button">新規会員登録</a>
@@ -26,8 +25,9 @@
             </div>
         </div>
         @include('include.footer', ['isTopPage' => true])
-        <page-loading />
-        <alert-message initial-msg="{{ session('alert.msg') }}" initial-type="{{ session('alert.type') }}" />
+        <alert-message initial-msg="{{ strval(session('alert.msg')) }}"
+            initial-type="{{ strval(session('alert.type')) }}"></alert-message>
+        <page-loading></page-loading>
     </div>
     @vite('resources/js/app.js')
 </body>

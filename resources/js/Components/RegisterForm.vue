@@ -1,4 +1,6 @@
 <script>
+import helpers from '../helpers';
+
 export default {
   props: [
     'oldEmail',
@@ -27,35 +29,8 @@ export default {
         return false;
       }
 
-      // メールアドレスのバリデーション
-      if (this.email.length === 0) {
-        this.emailErrorMsg = '入力してください。';
-      } else if (this.email.length > 150) {
-        this.emailErrorMsg = '150文字以下で入力してください。';
-      } else {
-        const emailRegex = /^[\w\-._]+@[\w\-._]+\.[A-Za-z]+$/;
-        if (emailRegex.test(this.email)) {
-          this.emailErrorMsg = '';
-        } else {
-          this.emailErrorMsg = 'メールアドレスの形式で入力してください。';
-        }
-      }
-
-      // パスワードのバリデーション
-      if (this.password.length === 0) {
-        this.passwordErrorMsg = '入力してください。';
-      } else if (this.password.length < 8) {
-        this.passwordErrorMsg = '8文字以上で入力してください。';
-      } else if (this.password.length > 255) {
-        this.passwordErrorMsg = '255文字以下で入力してください。';
-      } else {
-        const passwordRegex = /^[a-zA-Z0-9]+$/;
-        if (passwordRegex.test(this.password)) {
-          this.passwordErrorMsg = '';
-        } else {
-          this.passwordErrorMsg = '半角英数で入力してください。';
-        }
-      }
+      this.emailErrorMsg = helpers.validateEmail(this.email);
+      this.passwordErrorMsg = helpers.validatePassword(this.password);
 
       if (this.emailErrorMsg.length || this.passwordErrorMsg.length || !this.agreeToTermsOfUse || !this.consentToPrivacyPolicy) {
         e.preventDefault();
@@ -73,17 +48,17 @@ export default {
 <template>
   <form action="/register" method="post" @submit="validate">
     <input type="hidden" name="_token" :value="csrfToken">
-    <h1 class="c-page-heading">新規会員</h1>
+    <h1 class="c-page-heading">新規会員登録</h1>
     <div class="u-mb-20">
       <label class="c-form__label">メールアドレス</label>
       <input class="c-form__input-text" :class="{ 'c-form__input-text--error': emailErrorMsg }" type="text"
-        maxlength="150" v-model="email" name="email" required>
+        maxlength="150" v-model="email" name="email" placeholder="150文字以内" required>
       <div class="c-form__input-text-error-msg" v-show="emailErrorMsg">{{ emailErrorMsg }}</div>
     </div>
     <div class="u-mb-20">
       <label class="c-form__label">パスワード</label>
       <input-password name="password" v-model="password" :error-msg="passwordErrorMsg" place-holder="半角英数8~255文字"
-        :is-required="true" />
+        :is-required="true"></input-password>
     </div>
     <div class="u-mb-5">
       <input type="checkbox" name="agree_to_terms_of_use" value="1" class="c-form__input-checkbox"

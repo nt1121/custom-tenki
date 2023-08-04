@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
-class UserRegisterToken extends Model
+class PasswordResetRequest extends Model
 {
     use HasFactory;
 

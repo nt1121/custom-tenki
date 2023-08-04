@@ -11,17 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('email_change_requests', function (Blueprint $table) {
             $table->id();
-            //$table->string('name');
+            $table->unsignedBigInteger('user_id');
             $table->string('email', 150)->unique();
-            //$table->timestamp('email_verified_at')->nullable();
-            $table->dateTime('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->boolean('is_test_user')->default(false);
-            //$table->timestamps();
-            $table->unsignedBigInteger('area_id')->nullable();
+            $table->string('token');
+            $table->dateTime('expires_at');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
         });
@@ -32,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('email_change_requests');
     }
 };

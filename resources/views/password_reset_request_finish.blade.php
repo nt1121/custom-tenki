@@ -12,13 +12,14 @@
         <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
-                <h1 class="c-page-heading">無効なURL</h1>
-                <p>URLの有効期限が切れています。</p>
+                <h1 class="c-page-heading">パスワードの再設定</h1>
+                <p>
+                    メールアドレス宛に確認URLを記載したメールを送信いたしました。<br>
+                    メールが送信されない場合は、入力いただいたメールアドレスが登録されていないか、会員登録が完了していない可能性がございます。
+                </p>
             </div>
         </main>
         @include('include.footer')
-        <alert-message initial-msg="{{ strval(session('alert.msg')) }}"
-            initial-type="{{ strval(session('alert.type')) }}"></alert-message>
     </div>
     @vite('resources/js/app.js')
 </body>

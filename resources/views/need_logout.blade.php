@@ -12,13 +12,16 @@
         <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
-                <h1 class="c-page-heading">無効なURL</h1>
-                <p>URLの有効期限が切れています。</p>
+                @if (!empty($isPasswordReset))
+                <h1 class="c-page-heading">パスワードの再設定</h1>
+                <p>
+                    現在別の会員でログイン中です。<br>
+                    パスワードの再設定を行う場合は一度ログアウトしてからこのURLにもう一度アクセスしてください。
+                </p>
+                @endif
             </div>
         </main>
         @include('include.footer')
-        <alert-message initial-msg="{{ strval(session('alert.msg')) }}"
-            initial-type="{{ strval(session('alert.type')) }}"></alert-message>
     </div>
     @vite('resources/js/app.js')
 </body>

@@ -12,13 +12,16 @@
         <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
-                <h1 class="c-page-heading">無効なURL</h1>
-                <p>URLの有効期限が切れています。</p>
+                <h1 class="c-page-heading">パスワードの再設定</h1>
+                <p class="u-mb-20">パスワードの再設定が完了いたしました。</p>
+                @if (auth()->check())
+                <a href="/weather" class="c-button c-button--primary">ホームへ</a>
+                @else
+                <a href="/login" class="c-button c-button--primary">ログイン</a>
+                @endif
             </div>
         </main>
         @include('include.footer')
-        <alert-message initial-msg="{{ strval(session('alert.msg')) }}"
-            initial-type="{{ strval(session('alert.type')) }}"></alert-message>
     </div>
     @vite('resources/js/app.js')
 </body>
