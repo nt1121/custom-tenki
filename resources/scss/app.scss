@@ -9,25 +9,26 @@
 $breakpoint: (
     sp: 'screen and (max-width: 767px)'
 );
+
 $color: #333;
-$color-danger: #ff3333;
+$color-danger: #ff4500;
 $link-color: #2d5ae0;
 $button-color: #fff;
 $button-bg-color: #666;
 $button-bg-color-hover: #999;
 $button-bg-color-primary: #2d5ae0;
 $button-bg-color-primary-hover: #5a7be0;
-$button-bg-color-danger: #ff3333;
-$button-bg-color-danger-hover: #ff6666;
+$button-bg-color-danger: #ff4500;
+$button-bg-color-danger-hover: #ff6933;
 $top-color: #fff;
 $top-button-bg-color: #0080ff;
 $top-button-bg-color-hover: #3399ff;
 $alert-color: #fff;
 $alert-bg-color: #999;
 $alert-bg-color-success: #00cc00;
-$alert-bg-color-danger: #ff3333;
+$alert-bg-color-danger: #ff4500;
 $input-text-border-color: #ccc;
-$input-text-border-color-danger: #ff3333;
+$input-text-border-color-danger: #ff4500;
 $loading-circle-border-color: #fff;
 $spa-loading-circle-border-color: #666;
 $header-bg-color: #fff;
@@ -592,6 +593,12 @@ a {
     
     &__test-user-error {
         color: $color-danger;
+    }
+
+    &__selected-item-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 20px;
     }
 }
 

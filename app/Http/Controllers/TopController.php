@@ -2,32 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 
 class TopController extends Controller
 {
     /**
      * トップページの表示
      */
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
+        if (Auth::check()) {
+            return redirect('/weather');
+        }
+
         return view('top');
-    }
-
-    /**
-     * 利用規約の表示
-     */
-    public function showTermsOfServicePage(): View
-    {
-        return view('terms');
-    }
-
-    /**
-     * プライバシーポリシーの表示
-     */
-    public function showPrivacyPolicyPage(): View
-    {
-        return view('privacy');
     }
 }

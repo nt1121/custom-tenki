@@ -5,14 +5,14 @@ export default {
     state: {
         alertMessageTimeOutId: null,
         alertMessage: null,
-        isPageLoadingActive: false
+        isPageLoadingVisible: false
     },
     getters: {
         alertMessage(state) {
             return state.alertMessage;
         },
-        isPageLoadingActive(state) {
-            return state.isPageLoadingActive;
+        isPageLoadingVisible(state) {
+            return state.isPageLoadingVisible;
         }
     },
     mutations: {
@@ -20,7 +20,7 @@ export default {
             if (state.alertMessageTimeOutId !== null) {
                 clearTimeout(state.alertMessageTimeOutId);
             }
-            state.alertMessage = { type: payload.type, msg: payload.msg };
+            state.alertMessage = payload;
             state.alertMessageTimeOutId = setTimeout(() => {
                 state.alertMessage = null;
             }, 4000);
@@ -32,7 +32,10 @@ export default {
             state.alertMessage = null;
         },
         showPageLoading(state) {
-            state.isPageLoadingActive = true;
+            state.isPageLoadingVisible = true;
+        },
+        hidePageLoading(state) {
+            state.isPageLoadingVisible = false;
         }
     }
 };

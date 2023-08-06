@@ -43,7 +43,7 @@ export default {
 </script>
 
 <template>
-  <form action="/login" method="post" @submit="validate">
+  <form action="/login" method="POST" @submit="validate">
     <input type="hidden" name="_token" :value="csrfToken">
     <h1 class="c-page-heading">ログイン</h1>
     <div class="u-mb-20">
@@ -62,7 +62,7 @@ export default {
         v-model="remember"><label for="login-remember-checkbox" class="c-form__input-checkbox-label">ログイン状態を保持する</label>
     </div>
     <div class="u-mb-20">
-      <a href="/password_reset_request">パスワードをお忘れの方はこちら</a>
+      <a href="/password_reset/request">パスワードをお忘れの方はこちら</a>
     </div>
     <div class="u-mb-20">
       <a href="/register">新規会員登録はこちら</a>

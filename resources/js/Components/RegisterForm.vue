@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <form action="/register" method="post" @submit="validate">
+  <form action="/register" method="POST" @submit="validate">
     <input type="hidden" name="_token" :value="csrfToken">
     <h1 class="c-page-heading">新規会員登録</h1>
     <div class="u-mb-20">

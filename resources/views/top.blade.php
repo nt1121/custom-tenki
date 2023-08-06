@@ -12,7 +12,7 @@
                 <div class="p-top__cover-inner">
                     <h1 class="p-top__site-name">CustomTenki</h1>
                     <p class="p-top__site-description">表示する項目などがカスタマイズできる天気予報です。</p>
-                    <form action="" method="post" class="p-top__button-wrapper">
+                    <form action="" method="POST" class="p-top__button-wrapper">
                         <button type="submit" class="c-button c-button--primary p-top__button">テストユーザーとしてログイン</button>
                     </form>
                     <div class="p-top__button-wrapper">

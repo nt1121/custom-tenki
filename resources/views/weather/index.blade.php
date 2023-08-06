@@ -11,18 +11,16 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <p>{{ print_r(session('alert'), true) }}</p>
-                <login-form old-email="{{ old('email', '') }}" email-initial-error-msg="{{ $errors->first('email') }}"
-                    :old-remember="{{ old('remember') ? 'true' : 'false' }}" 
-                    password-initial-error-msg="{{ $errors->first('password') }}"></login-form>
+                <router-view :key="$route.fullPath"></router-view>
             </div>
         </main>
         @include('include.footer')
         <alert-message initial-msg="{{ strval(session('alert.msg')) }}"
             initial-type="{{ strval(session('alert.type')) }}"></alert-message>
+        <area-select-modal></area-select-modal>
         <page-loading></page-loading>
     </div>
-    @vite('resources/js/app.js')
+    @vite('resources/js/app_weather.js')
 </body>
 
 </html>

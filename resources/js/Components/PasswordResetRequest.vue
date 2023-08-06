@@ -37,7 +37,7 @@ export default {
 </script>
 
 <template>
-  <form action="/password_reset_request" method="post" @submit="validate">
+  <form action="/password_reset/request" method="POST" @submit="validate">
     <input type="hidden" name="_token" :value="csrfToken">
     <h1 class="c-page-heading">パスワードの再設定</h1>
     <p class="u-mb-20">
