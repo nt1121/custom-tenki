@@ -1,6 +1,9 @@
 export default {
     validateEmail: function (email) {
-        if (email === 0) {
+        // Laravelのバリデーション時には両端の空白が取り除かれるため、両端の空白は許容する
+        email = email.trim();
+
+        if (email.length === 0) {
             return '入力してください。';
         } else if (email > 150) {
             return '150文字以下で入力してください。';

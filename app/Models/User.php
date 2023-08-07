@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -51,5 +52,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class);
+    }
+
+    /**
+     * 天気予報の項目の取得
+     */
+    public function weatherForecastItems(): BelongsToMany
+    {
+        return $this->belongsToMany(WeatherForecastItem::class, 'user_weather_forecast_item', 'user_id', 'weather_forecast_item_id')
+            ->withPivot('display_order')
+            ->orderByPivot('display_order', 'asc');
     }
 }

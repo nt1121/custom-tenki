@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
-use App\Models\AreaGroup;
 use App\Models\Area;
+use App\Models\AreaGroup;
+use Illuminate\Support\Facades\Cache;
 
 class AreaGroupService
 {
     /**
      * エリアグループと紐づくエリアグループ、エリアの配列を取得する
-     * 
+     *
      * @param  null|int $id エリアグループID
-     * @return array
+     * @return array|bool
      */
-    public static function getAreaGroupAndChildren(?int $id): array
+    public static function getAreaGroupAndChildren(?int $id): array|bool
     {
         // キャッシュが存在する場合はキャッシュから取得
         $cacheKey = 'api_area_data_area_group_id_' . (is_null($id) ? 'null' : $id);
@@ -34,11 +34,11 @@ class AreaGroupService
                     ->toArray();
             } else {
                 $areaGroup = AreaGroup::find($id);
-    
+
                 if (empty($areaGroup)) {
-                    abort(404);
+                    return false;
                 }
-    
+
                 $data['id'] = $areaGroup->id;
                 $data['name'] = $areaGroup->name;
                 $data['parent_area_group_id'] = $areaGroup->parent_area_group_id;
@@ -48,17 +48,17 @@ class AreaGroupService
                     ->makeHidden(['parent_area_group_id', 'display_order', 'created_at', 'updated_at'])
                     ->toArray();
             }
-    
+
             $areas = Area::where('area_group_id', $id)
                 ->orderBy('display_order', 'asc')
                 ->get()
                 ->makeHidden(['latitude', 'longitude', 'area_group_id', 'display_order', 'created_at', 'updated_at'])
                 ->toArray();
-    
+
             foreach ($areas as $key => $area) {
                 $areas[$key]['is_area'] = true;
             }
-    
+
             $data['children'] = array_merge($areaGroups, $areas);
             // キャッシュに保存
             Cache::put($cacheKey, $data, 3600);

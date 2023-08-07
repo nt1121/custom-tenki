@@ -10,15 +10,14 @@ export default {
         }
     },
     mounted() {
-        this.getList(this.$route.params['id']);
+        this.getData(this.$route.params['id']);
     },
     methods: {
-        getList(areaGroupId) {
-            const url = '/api/area_groups/' + (areaGroupId !== undefined ? areaGroupId : '');
+        getData(areaGroupId) {
+            const url = '/api/settings/area_select/' + (areaGroupId !== undefined ? areaGroupId : '');
             axios.get(url)
                 .then(response => {
-                    if (response.data && response.data.user && response.data.area_group) {
-                        this.$store.commit('weather/setUser', response.data.user);
+                    if (response.data && response.data.area_group) {
                         this.list = response.data.area_group.children;
 
                         if (response.data.area_group) {
@@ -48,39 +47,41 @@ export default {
 </script>
 
 <template>
-    <div class="c-spa-loading" v-if="loading"></div>
-    <p v-else-if="tooManyRequests">
-        一定時間内のリクエストが多すぎます。<br>
-        しばらく経ってからもう一度お試しください。
-    </p>
-    <p v-else-if="error">情報の取得に失敗しました。</p>
-    <template v-else>
-        <h1 v-if="areaGroup.name !== null && areaGroup.parent_area_group_id !== null"
-            class="c-page-heading c-page-heading--with-left-arrow">
-            <router-link :to="'/weather/settings/area/' + areaGroup.parent_area_group_id">
-                <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
-            </router-link>{{ areaGroup.name }}
-        </h1>
-        <h1 v-else-if="areaGroup.name !== null && areaGroup.parent_area_group_id === null"
-            class="c-page-heading c-page-heading--with-left-arrow">
-            <router-link to="/weather/settings/area">
-                <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
-            </router-link>{{ areaGroup.name }}
-        </h1>
-        <h1 v-else class="c-page-heading c-page-heading--with-left-arrow">
-            <router-link to="/weather/settings">
-                <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
-            </router-link>地域の選択
-        </h1>
-        <div class="p-area-select">
-            <div v-for="area in list" :key="area.id" class="p-area-select__area-button-wrapper">
-                <button v-if="area.is_area" type="button" class="c-button c-button--primary p-area-select__area-button"
-                    @click="showModal(area.id, area.name)">{{ area.name
-                    }}</button>
-                <router-link v-else :to="'/weather/settings/area/' + area.id" class="c-button p-area-select__area-button">
-                    {{ area.name }}
-                </router-link>
+    <transition name="u-fade-route">
+        <p v-if="!loading && tooManyRequests">
+            一定時間内のリクエストが多すぎます。<br>
+            しばらく経ってからもう一度お試しください。
+        </p>
+        <p v-else-if="!loading && error">情報の取得に失敗しました。</p>
+        <div v-else-if="!loading">
+            <h1 v-if="areaGroup.name !== null && areaGroup.parent_area_group_id !== null"
+                class="c-page-heading c-page-heading--with-left-arrow">
+                <router-link :to="'/weather/settings/area/' + areaGroup.parent_area_group_id">
+                    <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
+                </router-link>{{ areaGroup.name }}
+            </h1>
+            <h1 v-else-if="areaGroup.name !== null && areaGroup.parent_area_group_id === null"
+                class="c-page-heading c-page-heading--with-left-arrow">
+                <router-link to="/weather/settings/area">
+                    <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
+                </router-link>{{ areaGroup.name }}
+            </h1>
+            <h1 v-else class="c-page-heading c-page-heading--with-left-arrow">
+                <router-link to="/weather/settings">
+                    <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow">
+                </router-link>地域の選択
+            </h1>
+            <div class="p-area-select">
+                <div v-for="area in list" :key="area.id" class="p-area-select__area-button-wrapper">
+                    <button v-if="area.is_area" type="button" class="c-button c-button--primary p-area-select__area-button"
+                        @click="showModal(area.id, area.name)">{{ area.name
+                        }}</button>
+                    <router-link v-else :to="'/weather/settings/area/' + area.id"
+                        class="c-button p-area-select__area-button">
+                        {{ area.name }}
+                    </router-link>
+                </div>
             </div>
         </div>
-    </template>
+    </transition>
 </template>

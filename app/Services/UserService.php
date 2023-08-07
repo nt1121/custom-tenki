@@ -2,20 +2,22 @@
 
 namespace App\Services;
 
+use App\Mail\NotificationMail;
+use App\Models\User;
+use App\Models\UserRegisterToken;
+use App\Models\UserWeatherForecastItem;
+use App\Models\WeatherForecastItem;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
-use App\Models\UserRegisterToken;
-use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 
 class UserService
 {
     /**
      * 会員登録する（メールアドレスは未認証でまだログインはできない）
-     * 
+     *
      * @param  string $email 登録する会員のメールアドレス
      * @param  string $password 登録する会員のパスワード
      * @return bool
@@ -52,7 +54,7 @@ END;
 
     /**
      * メールアドレスの認証を行い、会員登録を完了する
-     * 
+     *
      * @param  App\Models\User $user
      * @param  int $userRegisterTokenId 削除する会員登録用トークンのID
      * @return bool
@@ -61,6 +63,14 @@ END;
     {
         try {
             DB::beginTransaction();
+            $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
+            $displayOrder = 0;
+
+            foreach ($itemIds as $itemId) {
+                $displayOrder++;
+                UserWeatherForecastItem::create(['user_id' => $user->id, 'weather_forecast_item_id' => $itemId, 'display_order' => $displayOrder]);
+            }
+
             $user->email_verified_at = date('Y-m-d H:i:s');
             $user->save();
             UserRegisterToken::destroy($userRegisterTokenId);
@@ -77,7 +87,7 @@ END;
 
     /**
      * Vuexのストア用のログイン中の会員の連想配列を返す
-     * 
+     *
      * @param  App\Models\User $user
      * @return array
      */
@@ -100,7 +110,7 @@ END;
 
     /**
      * 会員のエリアIDを更新する
-     * 
+     *
      * @param  App\Models\User $user
      * @param  int $areaId 新しいエリアID
      * @return App\Models\User

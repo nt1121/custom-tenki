@@ -35,9 +35,8 @@ export default {
     },
     actions: {
         updateUserAreaId(context) {
-            console.log('updateUserAreaId');
             context.commit('common/showPageLoading', null, { root: true });
-            let error = null;
+            let isError = null;
             axios.post('/api/users/area_id', {
                 _method: 'PATCH',
                 user_id: context.state.user.id,
@@ -47,16 +46,16 @@ export default {
                     if (response.data && response.data.user) {
                         context.commit('hideAreaSelectModal');
                     } else {
-                        error = true;
+                        isError = true;
                     }
                 })
                 .catch(error => {
-                    error = true;
+                    isError = true;
                 })
                 .finally(() => {
                     context.commit('common/hidePageLoading', null, { root: true });
 
-                    if (error) {
+                    if (isError) {
                         context.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' }, { root: true });
                     } else {
                         context.commit('common/showAlertMessage', { msg: '地域を設定しました。', type: 'success' }, { root: true });

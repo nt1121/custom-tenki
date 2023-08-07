@@ -57,6 +57,7 @@ $modal-window-bg-color: #fff;
 
 html {
     height: 100vh;
+    overflow-y: scroll;
 }
 
 body {
@@ -646,6 +647,10 @@ a {
         background-color: $button-bg-color;
         color: $button-color;
 
+        &--chosen {
+            background-color: #333;
+        }
+
         &:last-child {
             margin: 0;
         }
@@ -961,6 +966,16 @@ a {
 }
 
 /* Fade */
+
+.u-fade-route-enter-active,
+.u-fade-route-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.u-fade-route-enter-from,
+.u-fade-route-leave-to {
+  opacity: 0;
+}
 
 .u-fade-hamburger-menu-enter-active,
 .u-fade-hamburger-menu-leave-active {

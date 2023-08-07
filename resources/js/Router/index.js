@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import WeatherForecast from '../Pages/WeatherForecast.vue';
 import Settings from '../Pages/Settings.vue';
 import AreaSelect from '../Pages/AreaSelect.vue';
+import ItemSelect from '../Pages/ItemSelect.vue';
 import NotFound from '../Pages/NotFound.vue';
 
 const routes = [
@@ -17,12 +18,17 @@ const routes = [
     },
     {
         path: '/weather/settings/area',
-        name: 'weather.area',
+        name: 'weather.settings.area',
         component: AreaSelect,
     },
     {
         path: '/weather/settings/area/:id(\\d+)',
         component: AreaSelect,
+    },
+    {
+        path: '/weather/settings/items',
+        name: 'weather.settings.items',
+        component: ItemSelect,
     },
     {
         path: '/:catchAll(.*)',

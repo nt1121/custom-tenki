@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
-class ApiUsersAreaIdPatchRequest extends FormRequest
+class UsersAreaIdPatchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,7 +19,7 @@ class ApiUsersAreaIdPatchRequest extends FormRequest
             $loginUser = Auth::user();
 
             // ログインしていない場合はfalseを返す
-            if (is_null($loginUser)) {
+            if (empty($loginUser)) {
                 return false;
             }
 

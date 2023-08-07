@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ApiUsersAreaIdPatchRequest;
+use App\Http\Requests\Api\UsersAreaIdPatchRequest;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +27,7 @@ class UserController extends Controller
     /**
      *
      */
-    public function updateAreaId(ApiUsersAreaIdPatchRequest $request)
+    public function updateAreaId(UsersAreaIdPatchRequest $request)
     {
         $user = $this->userService->updateAreaId(Auth::user(), $request->area_id);
         return response()->json([
