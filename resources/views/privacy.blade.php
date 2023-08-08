@@ -9,7 +9,6 @@
     <div class="l-wrapper" id="app">
         @include('include.header')
         @include('include.hamburger_menu')
-        <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
                 <div class="p-terms">

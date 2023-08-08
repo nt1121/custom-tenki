@@ -9,11 +9,10 @@
     <div class="l-wrapper" id="app">
         @include('include.header')
         @include('include.hamburger_menu')
-        <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
                 <h1 class="c-page-heading">パスワードの再設定</h1>
-                <p class="u-mb-20">パスワードの再設定が完了いたしました。</p>
+                <p class="u-mb-20">パスワードの再設定が完了しました。</p>
                 @if (auth()->check())
                 <a href="/weather" class="c-button c-button--primary">ホームへ</a>
                 @else

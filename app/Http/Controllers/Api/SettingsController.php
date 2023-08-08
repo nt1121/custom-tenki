@@ -66,7 +66,9 @@ class SettingsController extends Controller
 
     public function getEmailChangeData()
     {
-
+        return response()->json([
+            'user' => $this->userService->getUserStoreState(Auth::user()),
+        ]);
     }
 
     public function getPasswordChangeData()

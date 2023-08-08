@@ -41,14 +41,19 @@ export default {
                         this.itemsToDisplay = response.data.items_to_display;
                         this.itemsToHide = response.data.items_to_hide;
                     } else {
-                        this.isError = true
+                        this.isError = true;
                     }
                 })
                 .catch(error => {
-                    this.isError = true
+                    this.isError = true;
 
-                    if (error.response && error.response.status && error.response.status === 429) {
-                        this.tooManyRequests = true;
+                    if (error.response && error.response.status) {
+                        if (error.response.status === 429) {
+                            this.tooManyRequests = true;
+                        } else if (error.response.status === 401 && error.response.data && error.response.data.message === 'Unauthenticated.') {
+                            // ログインしていない場合はログイン画面にリダイレクト
+                            location.href = '/login';
+                        }
                     }
                 })
                 .finally(() => {
@@ -65,19 +70,19 @@ export default {
             })
                 .then(response => {
                     if (!response.data || !response.data.user_weather_forecast_item) {
-                        isError = true
+                        isError = true;
                     }
                 })
                 .catch(error => {
-                    isError = true
+                    isError = true;
                 })
                 .finally(() => {
-                    this.$store.commit('common/hidePageLoading', null, { root: true });
+                    this.$store.commit('common/hidePageLoading', null);
 
                     if (isError) {
-                        this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' }, { root: true });
+                        this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' });
                     } else {
-                        this.$store.commit('common/showAlertMessage', { msg: '地域を設定しました。', type: 'success' }, { root: true });
+                        this.$store.commit('common/showAlertMessage', { msg: '地域を設定しました。', type: 'success' });
                         this.$router.push('/weather/settings');
                     }
                 });
@@ -121,8 +126,9 @@ export default {
                     </draggable>
                 </div>
             </div>
-            <button type="button" class="c-button c-button--primary u-mr-20"
-                :disabled="itemsToDisplay.length === 0" @click="update">設定を保存</button>
-        <router-link to="/weather/settings" class="c-button">キャンセル</router-link>
-    </div>
-</transition></template>
+            <button type="button" class="c-button c-button--primary u-mr-20" :disabled="itemsToDisplay.length === 0"
+                @click="update">設定を保存</button>
+            <router-link to="/weather/settings" class="c-button">キャンセル</router-link>
+        </div>
+    </transition>
+</template>

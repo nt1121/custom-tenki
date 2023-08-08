@@ -25,14 +25,19 @@ export default {
                             this.areaGroup = response.data.area_group;
                         }
                     } else {
-                        this.isError = true
+                        this.isError = true;
                     }
                 })
                 .catch(error => {
-                    this.isError = true
+                    this.isError = true;
 
-                    if (error.response && error.response.status && error.response.status === 429) {
-                        this.tooManyRequests = true;
+                    if (error.response && error.response.status) {
+                        if (error.response.status === 429) {
+                            this.tooManyRequests = true;
+                        } else if (error.response.status === 401 && error.response.data && error.response.data.message === 'Unauthenticated.') {
+                            // ログインしていない場合はログイン画面にリダイレクト
+                            location.href = '/login';
+                        }
                     }
                 })
                 .finally(() => {

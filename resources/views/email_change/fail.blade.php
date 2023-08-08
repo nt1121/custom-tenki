@@ -11,11 +11,8 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <h1 class="c-page-heading">新規会員登録</h1>
-                <p class="u-mb-20">
-                    会員登録が完了しました。
-                </p>
-                <a href="/weather/settings/area" class="c-button">地域の選択</a>
+                <h1 class="c-page-heading">メールアドレスの変更</h1>
+                <p class="u-mb-20">メールアドレスが変更できませんでした。</p>
             </div>
         </main>
         @include('include.footer')

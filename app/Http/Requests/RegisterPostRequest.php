@@ -23,7 +23,7 @@ class RegisterPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'bail|required|email:rfc|max:150|unique:users',
+            'email' => 'bail|required|email:rfc|max:150|unique:users|unique:email_change_requests',
             'password' => 'bail|required|min:8|max:255|regex:/\A[a-zA-Z0-9]+\z/',
         ];
     }

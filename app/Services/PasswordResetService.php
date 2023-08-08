@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
-use App\Models\PasswordResetRequest;
 use App\Mail\NotificationMail;
+use App\Models\PasswordResetRequest;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class PasswordResetService
 {
     /**
      * パスワード変更申請を作成する
-     * 
+     *
      * @param  int $userId 会員ID
      * @param  string $email 会員のメールアドレス
      * @return bool
@@ -37,7 +37,7 @@ class PasswordResetService
 ※このメールの送信後にパスワード再設定画面からのパスワードの再設定の申請が行われた場合、上記のURLは無効になります。
 ※CustomTenkiに会員登録をした覚えがない場合は、お手数ですがこのメールを破棄くださいますようお願い申し上げます。
 END;
-            Mail::to($email)->send(new NotificationMail('【CustomTenki】メールアドレスの確認', $text));
+            Mail::to($email)->send(new NotificationMail('【CustomTenki】パスワード再設定のご案内', $text));
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -50,11 +50,11 @@ END;
 
     /**
      * 会員のパスワードを変更する
-     * 
+     *
      * @param  App\Models\User $user
      * @param  string $password 新しいパスワード
      * @param  int $passwordResetRequestId 削除するパスワード変更申請のID
-     * @return bool
+     * @return App\Models\User|bool
      */
     public function reset(User $user, string $password, int $passwordResetRequestId)
     {
@@ -70,6 +70,6 @@ END;
             return false;
         }
 
-        return true;
+        return $user;
     }
 }

@@ -14,25 +14,35 @@ export default {
     }
   },
   mounted() {
-    axios.get('/api/settings')
-      .then(response => {
-        if (response.data && response.data.user && response.data.items_to_display) {
-          this.$store.commit('weather/setUser', response.data.user);
-          this.itemsToDisplay = response.data.items_to_display;
-        } else {
+    this.getData();
+  },
+  methods: {
+    getData() {
+      axios.get('/api/settings')
+        .then(response => {
+          if (response.data && response.data.user && response.data.items_to_display) {
+            this.$store.commit('weather/setUser', response.data.user);
+            this.itemsToDisplay = response.data.items_to_display;
+          } else {
+            this.isError = true;
+          }
+        })
+        .catch(error => {
           this.isError = true;
-        }
-      })
-      .catch(error => {
-        this.isError = true;
 
-        if (error.response && error.response.status && error.response.status === 429) {
-          this.tooManyRequests = true;
-        }
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+          if (error.response && error.response.status) {
+            if (error.response.status === 429) {
+              this.tooManyRequests = true;
+            } else if (error.response.status === 401 && error.response.data && error.response.data.message === 'Unauthenticated.') {
+              // ログインしていない場合はログイン画面にリダイレクト
+              location.href = '/login';
+            }
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    }
   }
 }
 </script>
@@ -63,7 +73,7 @@ export default {
         <h2 class="p-settings__heading">メールアドレス</h2>
         <p class="u-mb-20">{{ user ? user.email : '' }}</p>
         <p v-if="user.is_test_user" class="p-settings__test-user-error">テストユーザーのメールアドレスは変更できません。</p>
-        <button v-else type="button" class="c-button">メールアドレスの変更</button>
+        <router-link v-else to="/weather/settings/email" class="c-button">メールアドレスの変更</router-link>
       </div>
       <div class="u-mb-20">
         <h2 class="p-settings__heading">パスワード</h2>

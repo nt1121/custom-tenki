@@ -6,26 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UsersAreaIdPatchRequest;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Api\UsersEmailPostRequest;
+use App\Services\EmailChangeService;
 
 class UserController extends Controller
 {
     public function __construct(
-        protected UserService $userService
+        protected UserService $userService,
+        protected EmailChangeService $emailChangeService
     ) {
     }
 
     /**
-     *
-     */
-    public function getUserStoreState()
-    {
-        return response()->json([
-            'user' => $this->userService->getUserStoreState(Auth::user()),
-        ]);
-    }
-
-    /**
-     *
+     * 会員の地域IDを更新する
      */
     public function updateAreaId(UsersAreaIdPatchRequest $request)
     {
@@ -33,6 +26,21 @@ class UserController extends Controller
         return response()->json([
             'user' => $this->userService->getUserStoreState($user),
         ]);
+    }
+
+    /**
+     * メールアドレスの変更申請を登録する
+     */
+    public function requestEmailChange(UsersEmailPostRequest $request)
+    {
+        if (!$this->emailChangeService->createRequest($request->user_id, $request->email)) {
+            return response()->json([
+                'status' => 404,
+                'errors' => ['メールアドレス変更の申請が登録できませんでした。'],
+            ], 404);
+        }
+
+        return response()->json(['status' => 200]);
     }
 
     /**

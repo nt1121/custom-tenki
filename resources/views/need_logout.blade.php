@@ -9,7 +9,6 @@
     <div class="l-wrapper" id="app">
         @include('include.header')
         @include('include.hamburger_menu')
-        <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
                 @if (!empty($isPasswordReset))
@@ -17,6 +16,12 @@
                 <p>
                     現在別の会員でログイン中です。<br>
                     パスワードの再設定を行う場合は一度ログアウトしてからこのURLにもう一度アクセスしてください。
+                </p>
+                @elseif (!empty($isEmailChange))
+                <h1 class="c-page-heading">メールアドレスの変更</h1>
+                <p>
+                    現在別の会員でログイン中です。<br>
+                    メールアドレスの変更を行う場合は一度ログアウトしてからこのURLにもう一度アクセスしてください。
                 </p>
                 @endif
             </div>

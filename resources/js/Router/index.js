@@ -3,6 +3,7 @@ import WeatherForecast from '../Pages/WeatherForecast.vue';
 import Settings from '../Pages/Settings.vue';
 import AreaSelect from '../Pages/AreaSelect.vue';
 import ItemSelect from '../Pages/ItemSelect.vue';
+import EmailChange from '../Pages/EmailChange.vue';
 import NotFound from '../Pages/NotFound.vue';
 
 const routes = [
@@ -29,6 +30,11 @@ const routes = [
         path: '/weather/settings/items',
         name: 'weather.settings.items',
         component: ItemSelect,
+    },
+    {
+        path: '/weather/settings/email',
+        name: 'weather.settings.email',
+        component: EmailChange,
     },
     {
         path: '/:catchAll(.*)',

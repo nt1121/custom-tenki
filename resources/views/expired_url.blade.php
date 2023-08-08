@@ -9,7 +9,6 @@
     <div class="l-wrapper" id="app">
         @include('include.header')
         @include('include.hamburger_menu')
-        <p>{{ $errors->first('password') }}</p>
         <main class="l-main">
             <div class="l-main__inner">
                 <h1 class="c-page-heading">無効なURL</h1>

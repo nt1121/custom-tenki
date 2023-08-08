@@ -27,16 +27,18 @@ Route::get('/password_reset/request', [\App\Http\Controllers\PasswordResetContro
 Route::post('/password_reset/request', [\App\Http\Controllers\PasswordResetController::class, 'request']);
 Route::get('/password_reset/{token}', [\App\Http\Controllers\PasswordResetController::class, 'showResetPage']);
 Route::patch('/password_reset', [\App\Http\Controllers\PasswordResetController::class, 'reset']);
+Route::get('/email_change/{token}', [\App\Http\Controllers\EmailChangeController::class, 'changeUserEmail']);
 
 Route::middleware(['auth', 'verified:login'])->group(function () {
     Route::middleware(['throttle:webapi'])->prefix('api')->group(function () {
         Route::get('/weather', [\App\Http\Controllers\Api\WeatherController::class, 'getWeatherData']);
         Route::patch('/users/area_id', [\App\Http\Controllers\Api\UserController::class, 'updateAreaId']);
+        Route::post('/users/email', [\App\Http\Controllers\Api\UserController::class, 'requestEmailChange']);
         Route::put('/user_weather_forecast_item', [\App\Http\Controllers\Api\UserWeatherForecastItemController::class, 'deleteAndInsert']);
         Route::get('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'getSettingsData']);
         Route::get('/settings/area_select/{id?}', [\App\Http\Controllers\Api\SettingsController::class, 'getAreaSelectData'])->where(['id' => '[1-9][0-9]*']);
         Route::get('/settings/item_select', [\App\Http\Controllers\Api\SettingsController::class, 'getItemSelectData']);
-
+        Route::get('/settings/email_change', [\App\Http\Controllers\Api\SettingsController::class, 'getEmailChangeData']);
     });
 
     Route::get('/weather{any}', [\App\Http\Controllers\WeatherController::class, 'index'])->where('any', '.*');

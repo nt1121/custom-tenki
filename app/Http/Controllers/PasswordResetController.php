@@ -62,6 +62,11 @@ class PasswordResetController extends Controller
      */
     public function showResetPage(string $token): View | RedirectResponse
     {
+        // トークンが長すぎる場合は不正なURL扱いにする
+        if (mb_strlen($token) > 255) {
+            return view('expired_url');
+        }
+
         $passwordResetRequest = PasswordResetRequest::where('token', $token)->where('expires_at', '>=', date('Y-m-d H:i:s'))->first();
 
         if (empty($passwordResetRequest)) {
