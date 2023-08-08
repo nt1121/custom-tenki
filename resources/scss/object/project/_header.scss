@@ -1,0 +1,141 @@
+/* Header */
+
+.p-header {
+    border-bottom: 1px solid $header-border-color;
+    background-color: $header-bg-color;
+    height: 51px;
+
+    &__inner {
+        width: 100%;
+        max-width: 1040px;
+        min-width: 320px;
+        padding: 0 20px;
+        margin: 0 auto;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        height: 50px;
+        position: relative;
+    
+        @include mq(sp) {
+            padding: 0 10px;
+        }
+    }
+
+    &__logo {
+        font-weight: bold;
+        font-size: 24px;
+        height: 36px;
+    }
+    
+    &__logo-link {
+        color: $color;
+        /* $font-color */
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    &__nav-list {
+        list-style: none;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        margin: 0;
+
+        @include mq(sp) {
+            display: none;
+        }
+    }
+
+    &__nav-list-item {
+        margin-right: 20px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+    
+    &__nav-list-item-link {
+        font-weight: bold;
+        display: block;
+        padding: 0 10px;
+        line-height: 24px;
+        text-decoration: none;
+        color: $header-link-color;
+        transition: color 0.3s;
+        border: none;
+        background: none;
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+            color: $header-link-color-hover;
+        }
+    }
+
+    &__hamburger-button {
+        display: none;
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+    
+        @include mq(sp) {
+            display: block;
+        }
+    }
+    
+    &__hamburger-button-line1 {
+        background-color: $color;
+        width: 30px;
+        height: 4px;
+        position: absolute;
+        top: 3px;
+        left: 0;
+        transition: all 0.3s;
+
+        &--active {
+            transform: rotate(45deg);
+            top: 13px;
+        }
+    }
+
+    &__hamburger-button-line2 {
+        background-color: $color;
+        width: 30px;
+        height: 4px;
+        position: absolute;
+        top: 13px;
+        left: 0;
+        transition: all 0.3s;
+
+        &--active {
+            opacity: 0;
+        }
+    }
+
+    &__hamburger-button-line3 {
+        background-color: $color;
+        width: 30px;
+        height: 4px;
+        position: absolute;
+        top: 23px;
+        left: 0;
+        transition: all 0.3s;
+
+        &--active {
+            transform: rotate(-45deg);
+            top: 13px;
+        }
+    }
+}

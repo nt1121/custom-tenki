@@ -44,13 +44,13 @@ export default {
 
 <template>
   <transition name="u-fade-route">
-    <p v-if="!loading && tooManyRequests">
+    <p v-if="!loading && tooManyRequests" class="u-mt-0">
       一定時間内のリクエストが多すぎます。<br>
       しばらく経ってからもう一度お試しください。
     </p>
-    <p v-else-if="!loading && isError">情報の取得に失敗しました。</p>
+    <p v-else-if="!loading && isError" class="u-mt-0">情報の取得に失敗しました。</p>
     <div v-else-if="!loading && area === null">
-      <p class="u-mb-20">地域が設定されていません。</p>
+      <p class="u-mb-20 u-mt-0">地域が設定されていません。</p>
       <router-link to="/weather/settings/area" class="c-button">地域の選択</router-link>
     </div>
     <div v-else-if="!loading && area && list" class="p-wheather-forecast">

@@ -1,0 +1,21 @@
+/* Fade */
+
+.u-fade-route-enter-active,
+.u-fade-route-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.u-fade-route-enter-from,
+.u-fade-route-leave-to {
+  opacity: 0;
+}
+
+.u-fade-hamburger-menu-enter-active,
+.u-fade-hamburger-menu-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.u-fade-hamburger-menu-enter-from,
+.u-fade-hamburger-menu-leave-to {
+  opacity: 0;
+}

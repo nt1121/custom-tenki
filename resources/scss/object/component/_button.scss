@@ -1,0 +1,40 @@
+/* Button */
+
+.c-button {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background-color: $button-bg-color;
+    color: $button-color;
+    vertical-align: middle;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: $button-bg-color-hover;
+    }
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        background-color: $button-bg-color-primary;
+
+        &:hover {
+            background-color: $button-bg-color-primary-hover;
+        }
+    }
+
+    &--danger {
+        background-color: $button-bg-color-danger;
+
+        &:hover {
+            background-color: $button-bg-color-danger-hover;
+        }
+    }
+}

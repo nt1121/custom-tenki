@@ -1,0 +1,29 @@
+/* Loading */
+
+.p-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 3000;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+
+    &__icon {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $loading-circle-border-color;
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        animation: rotate 1s linear 0s infinite;
+    }
+}

@@ -1,0 +1,53 @@
+/* Item Select */
+
+.p-item-select {
+    &__error-msg {
+        color: $color-danger;
+        margin-bottom: 20px;
+    }
+    
+    &__box-wrapper {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    &__box {
+        width: calc(50% - 5px);
+        padding: 0;
+
+        ul {
+            list-style-type: none;
+            padding: 4px;
+            min-height: 305px;
+            border: 1px solid $item-select-border-color;
+            margin: 0;
+        }
+    }
+    
+    &__box-label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    &__box-list-item {
+        cursor: pointer;
+        padding: 10px;
+        width: 100%;
+        margin: 0 0 5px;
+        background-color: $button-bg-color;
+        color: $button-color;
+
+        &--chosen {
+            background-color: #333;
+        }
+
+        &:last-child {
+            margin: 0;
+        }
+    }
+}

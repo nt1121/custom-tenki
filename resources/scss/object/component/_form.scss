@@ -1,0 +1,83 @@
+/* Form */
+
+.c-form {
+    &__label {
+        font-size: 16px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    &__input-text {
+        font-size: 16px;
+        border: 1px solid $input-text-border-color;
+        display: block;
+        height: 40px;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 16px;
+
+        &--error {
+            border: 1px solid $input-text-border-color-danger;
+        }
+    }
+
+    &__input-text-error-msg {
+        margin-top: 5px;
+        color: $color-danger;
+    }
+    
+    &__input-password {
+        font-size: 16px;
+        border: 1px solid $input-text-border-color;
+        display: block;
+        height: 40px;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 40px 0 16px;
+
+        &--error {
+            border: 1px solid $input-text-border-color-danger;
+        }
+    }
+    
+    &__input-password-error-msg {
+        margin-top: 5px;
+        color: $color-danger;
+    }
+    
+    &__input-password-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    &__input-password-eye-icon {
+        display: block;
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 8px;
+        right: 8px;
+        cursor: pointer;
+    }
+    
+    &__input-password-eye-icon-line {
+        position: absolute;
+        top: 19px;
+        right: 5px;
+        height: 2px;
+        width: 30px;
+        background-color: $color;
+        transform: rotate(45deg);
+        pointer-events: none;
+    }
+    
+    &__input-checkbox {
+        margin-right: 5px;
+    }
+    
+    &__input-checkbox-label {
+        font-weight: bold;
+    }
+}

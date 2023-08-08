@@ -1,0 +1,65 @@
+/* Top */
+
+.p-top {
+    color: $top-color;
+    min-height: 100vh;
+    background-image: url('/img/top_bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    &__cover {
+        min-height: 100vh;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    
+    &__cover-inner {
+        margin: 0 auto;
+        max-width: 840px;
+        padding: 30px 20px 143px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -ms-flex-line-pack: center;
+        align-content: center;
+        min-height: 100vh;
+    
+        @include mq(sp) {
+            padding: 30px 10px 143px;
+        }
+    }
+
+    &__site-name {
+        font-weight: bold;
+        font-size: 36px;
+        text-align: center;
+        margin: 0 0 30px;
+        width: 100%;
+    }
+
+    &__site-description {
+        font-weight: bold;
+        font-size: 24px;
+        text-align: center;
+        margin: 0 0 40px;
+        width: 100%;
+    }
+
+    &__button {
+        width: 100%;
+        max-width: 320px;
+        font-weight: bold;
+        background-color: $top-button-bg-color;
+    
+        &:hover {
+            background-color: $top-button-bg-color-hover;
+        }
+    }
+    
+    &__button-wrapper {
+        width: 100%;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+}

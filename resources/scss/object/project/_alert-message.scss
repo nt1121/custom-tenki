@@ -1,0 +1,57 @@
+/* Alert Message */
+
+.p-alert-message {
+    width: 90%;
+    max-width: 400px;
+    padding: 10px 44px;
+    background-color: $alert-bg-color;
+    color: $alert-color;
+    font-weight: bold;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 3px;
+    text-align: center;
+    animation: alert-message-fadeout 4s linear 0s;
+    opacity: 0;
+
+    &--success {
+        background-color: $alert-bg-color-success;
+    }
+    
+    &--error {
+        background-color: $alert-bg-color-danger;
+    }
+    
+    &__close-button {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+    
+        &::before {
+            content: "";
+            background-color: $alert-color;
+            position: absolute;
+            top: 10px;
+            left: -1px;
+            height: 3px;
+            width: 26px;
+            transform: rotate(45deg);
+        }
+        
+        &::after {
+            content: "";
+            background-color: $alert-color;
+            position: absolute;
+            top: 10px;
+            left: -1px;
+            height: 3px;
+            width: 26px;
+            transform: rotate(-45deg);
+        }
+    }
+}

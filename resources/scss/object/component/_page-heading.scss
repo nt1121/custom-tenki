@@ -1,0 +1,22 @@
+/* Page Heading */
+
+.c-page-heading {
+    font-size: 24px;
+    margin: 0 0 20px;
+    width: 100%;
+
+    &--with-left-arrow {
+        position: relative;
+        padding-left: 48px;
+    }
+
+    &__left-arrow {
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 32px;
+        height: 32px;
+        display: block;
+        cursor: pointer;
+    }
+}

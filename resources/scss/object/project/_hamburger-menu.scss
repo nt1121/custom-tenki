@@ -1,0 +1,39 @@
+/* Hamburger Menu */
+
+.p-hamburger-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 500;
+    display: none;
+    background-color: $header-bg-color;
+    padding-top: 51px;
+
+    @include mq(sp) {
+        display: block;
+    }
+
+    &__link {
+        display: block;
+        height: 51px;
+        border-top: none;
+        border-right: none;
+        border-left: none;
+        border-bottom: 1px solid $header-border-color;
+        color: $color;
+        text-decoration: none;
+        text-align: center;
+        line-height: 50px;
+        font-weight: bold;
+        background: none;
+        font-size: 16px;
+        width: 100%;
+        cursor: pointer;
+    
+        &:hover {
+            color: $header-link-color-hover;
+        }
+    }
+}

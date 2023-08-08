@@ -1,0 +1,48 @@
+/* Weather Forecast */
+
+.p-wheather-forecast {
+    &__area-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0 0 20px;
+    }
+    
+    &__date {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 0 20px;
+    }
+    
+    &__table-wrapper {
+        overflow-x: auto;
+        margin: 0 0 20px;
+    }
+    
+    &__table {
+        width: 100%;
+        border: none;
+        border-collapse: collapse;
+    }
+    
+    &__table-th {
+        border-bottom: 2px solid $table-border-color;
+        font-size: 16px;
+        font-weight: bold;
+        white-space: nowrap;
+        padding: 0 10px;
+    }
+    
+    &__table-td {
+        border-bottom: 1px solid $table-border-color;
+        text-align: center;
+        height: 51px;
+        padding: 0 10px;
+        white-space: nowrap;
+    }
+    
+    &__table-td-icon {
+        display: block;
+        margin: 0 auto;
+        width: 50px;
+    }
+}

@@ -1,0 +1,16 @@
+/* Main */
+
+.l-main {
+    padding: 51px 0 113px;
+
+    &__inner {
+        max-width: 840px;
+        min-width: 320px;
+        padding: 30px 20px;
+        margin: 0 auto;
+    
+        @include mq(sp) {
+            padding: 30px 10px;
+        }
+    }
+}
