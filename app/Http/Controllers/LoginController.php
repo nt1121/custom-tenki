@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -39,5 +40,21 @@ class LoginController extends Controller
 
         return back()->withErrors(['email' => 'メールアドレスまたはパスワードが間違っています。'])
             ->withInput($request->except('password'));
+    }
+
+    /**
+     * テストユーザーとしてログイン
+     */
+    public function loginAsTestUser(Request $request): RedirectResponse
+    {
+        $testUser = User::where('is_test_user', true)->first();
+
+        if (empty($testUser)) {
+            return back()->with('alert', ['msg' => 'テストユーザーが登録されていません。', 'type' => 'error']);
+        }
+
+        Auth::login($testUser);
+        $request->session()->regenerate();
+        return redirect('/weather');
     }
 }

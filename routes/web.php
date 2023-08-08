@@ -18,6 +18,7 @@ Route::get('/terms', [\App\Http\Controllers\TermsController::class, 'index']);
 Route::get('/privacy', [\App\Http\Controllers\PrivacyController::class, 'index']);
 Route::get('/login', [\App\Http\Controllers\LoginController::class, 'show'])->name('login');
 Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login']);
+Route::post('/test_user_login', [\App\Http\Controllers\LoginController::class, 'loginAsTestUser']);
 Route::post('/logout', [\App\Http\Controllers\LogoutController::class, 'logout']);
 Route::get('/register', [\App\Http\Controllers\RegisterController::class, 'show']);
 Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register']);

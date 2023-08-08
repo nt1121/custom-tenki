@@ -82,6 +82,7 @@ END;
         }
 
         Auth::login($user);
+        request()->session()->regenerate();
         return true;
     }
 

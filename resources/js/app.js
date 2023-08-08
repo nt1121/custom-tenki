@@ -26,6 +26,9 @@ const app = createApp({
             setTimeout(() => {
                 this.canToggleHamburgerButton = true;
             }, 200);
+        },
+        showPageLoading() {
+            this.$store.commit('common/showPageLoading');
         }
     },
 });
