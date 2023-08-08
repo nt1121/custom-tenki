@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Cache;
 class AreaGroupService
 {
     /**
-     * エリアグループと紐づくエリアグループ、エリアの配列を取得する
+     * 地域グループとそれに紐づく地域グループ、地域の配列を取得する
      *
-     * @param  null|int $id エリアグループID
+     * @param  null|int $id 地域グループID
      * @return array|bool
      */
     public static function getAreaGroupAndChildren(?int $id): array|bool

@@ -29,6 +29,7 @@ Route::patch('/password_reset', [\App\Http\Controllers\PasswordResetController::
 
 Route::middleware(['auth', 'verified:login'])->group(function () {
     Route::middleware(['throttle:webapi'])->prefix('api')->group(function () {
+        Route::get('/weather', [\App\Http\Controllers\Api\WeatherController::class, 'getWeatherData']);
         Route::patch('/users/area_id', [\App\Http\Controllers\Api\UserController::class, 'updateAreaId']);
         Route::put('/user_weather_forecast_item', [\App\Http\Controllers\Api\UserWeatherForecastItemController::class, 'deleteAndInsert']);
         Route::get('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'getSettingsData']);

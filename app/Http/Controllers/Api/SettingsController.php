@@ -41,11 +41,12 @@ class SettingsController extends Controller
         if (!$areaGroup) {
             return response()->json([
                 'status' => 404,
-                'errors' => ['エリアグループが取得できませんでした。'],
+                'errors' => ['地域グループが取得できませんでした。'],
             ], 404);
         }
 
         return response()->json([
+            'user' => $this->userService->getUserStoreState(Auth::user()),
             'area_group' => $areaGroup,
         ]);
     }

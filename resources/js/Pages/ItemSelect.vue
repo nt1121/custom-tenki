@@ -5,7 +5,7 @@ export default {
     data() {
         return {
             loading: true,
-            error: null,
+            isError: null,
             tooManyRequests: null,
             chosenFromList: null,
             chosenIndex: null,
@@ -41,11 +41,11 @@ export default {
                         this.itemsToDisplay = response.data.items_to_display;
                         this.itemsToHide = response.data.items_to_hide;
                     } else {
-                        this.error = true
+                        this.isError = true
                     }
                 })
                 .catch(error => {
-                    this.error = true
+                    this.isError = true
 
                     if (error.response && error.response.status && error.response.status === 429) {
                         this.tooManyRequests = true;
@@ -92,7 +92,7 @@ export default {
             一定時間内のリクエストが多すぎます。<br>
             しばらく経ってからもう一度お試しください。
         </p>
-        <p v-else-if="!loading && error">情報の取得に失敗しました。</p>
+        <p v-else-if="!loading && isError">情報の取得に失敗しました。</p>
         <div v-else-if="!loading" class="p-item-select">
             <h1 class="c-page-heading">項目の選択</h1>
             <p class="u-mb-20">項目をドラッグアンドドロップで移動してください。<br>上の項目が左に表示されます。</p>

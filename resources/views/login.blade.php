@@ -11,7 +11,6 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <p>{{ print_r(session('alert'), true) }}</p>
                 <login-form old-email="{{ old('email', '') }}" email-initial-error-msg="{{ $errors->first('email') }}"
                     :old-remember="{{ old('remember') ? 'true' : 'false' }}" 
                     password-initial-error-msg="{{ $errors->first('password') }}"></login-form>

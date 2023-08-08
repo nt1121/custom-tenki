@@ -3,7 +3,7 @@ export default {
     data() {
         return {
             loading: true,
-            error: null,
+            isError: null,
             tooManyRequests: null,
             areaGroup: null,
             list: []
@@ -17,18 +17,19 @@ export default {
             const url = '/api/settings/area_select/' + (areaGroupId !== undefined ? areaGroupId : '');
             axios.get(url)
                 .then(response => {
-                    if (response.data && response.data.area_group) {
+                    if (response.data && response.data.user && response.data.area_group) {
+                        this.$store.commit('weather/setUser', response.data.user);
                         this.list = response.data.area_group.children;
 
                         if (response.data.area_group) {
                             this.areaGroup = response.data.area_group;
                         }
                     } else {
-                        this.error = true
+                        this.isError = true
                     }
                 })
                 .catch(error => {
-                    this.error = true
+                    this.isError = true
 
                     if (error.response && error.response.status && error.response.status === 429) {
                         this.tooManyRequests = true;
@@ -52,7 +53,7 @@ export default {
             一定時間内のリクエストが多すぎます。<br>
             しばらく経ってからもう一度お試しください。
         </p>
-        <p v-else-if="!loading && error">情報の取得に失敗しました。</p>
+        <p v-else-if="!loading && isError">情報の取得に失敗しました。</p>
         <div v-else-if="!loading">
             <h1 v-if="areaGroup.name !== null && areaGroup.parent_area_group_id !== null"
                 class="c-page-heading c-page-heading--with-left-arrow">

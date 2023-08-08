@@ -3,7 +3,7 @@ export default {
   data() {
     return {
       loading: true,
-      error: null,
+      isError: null,
       tooManyRequests: null,
       itemsToDisplay: [],
     }
@@ -20,11 +20,11 @@ export default {
           this.$store.commit('weather/setUser', response.data.user);
           this.itemsToDisplay = response.data.items_to_display;
         } else {
-          this.error = true;
+          this.isError = true;
         }
       })
       .catch(error => {
-        this.error = true;
+        this.isError = true;
 
         if (error.response && error.response.status && error.response.status === 429) {
           this.tooManyRequests = true;
@@ -43,7 +43,7 @@ export default {
       一定時間内のリクエストが多すぎます。<br>
       しばらく経ってからもう一度お試しください。
     </p>
-    <p v-else-if="!loading && error">情報の取得に失敗しました。</p>
+    <p v-else-if="!loading && isError">情報の取得に失敗しました。</p>
     <div v-else-if="!loading">
       <h1 class="c-page-heading">設定</h1>
       <div class="u-mb-20">
@@ -76,6 +76,5 @@ export default {
         <button v-else type="button" class="c-button c-button--danger">アカウントの削除</button>
       </div>
     </div>
-
   </transition>
 </template>

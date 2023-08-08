@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedInteger('display_order');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
+
+            $table->foreign('parent_area_group_id')->references('id')->on('area_groups')->nullOnDelete();;
         });
     }
 

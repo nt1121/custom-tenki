@@ -19,6 +19,8 @@ return new class extends Migration
             $table->dateTime('expires_at');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();;
         });
     }
 
