@@ -83,7 +83,7 @@ export default {
       <div class="u-mb-20">
         <h2 class="p-settings__heading">アカウント</h2>
         <p v-if="user.is_test_user" class="p-settings__test-user-error">テストユーザーのアカウントは削除できません。</p>
-        <button v-else type="button" class="c-button c-button--danger">アカウントの削除</button>
+        <a v-else href="/unregister" class="c-button c-button--danger">アカウントの削除</a>
       </div>
     </div>
   </transition>

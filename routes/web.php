@@ -37,9 +37,6 @@ Route::get('/password_reset/{token}', [\App\Http\Controllers\PasswordResetContro
 Route::patch('/password_reset', [\App\Http\Controllers\PasswordResetController::class, 'reset']);
 // メールアドレスの変更
 Route::get('/email_change/{token}', [\App\Http\Controllers\EmailChangeController::class, 'changeUserEmail']);
-// アカウントの削除
-//Route::get('/unregister', [\App\Http\Controllers\UnregisterController::class, 'show']);
-//Route::delete('/unregister', [\App\Http\Controllers\UnregisterController::class, 'unregister']);
 
 Route::middleware(['auth', 'verified:login'])->group(function () {
     // SPAからリクエストするAPIのルート
@@ -64,4 +61,7 @@ Route::middleware(['auth', 'verified:login'])->group(function () {
 
     // SPA
     Route::get('/weather{any}', [\App\Http\Controllers\WeatherController::class, 'index'])->where('any', '.*');
+    // アカウントの削除
+    Route::get('/unregister', [\App\Http\Controllers\UnregisterController::class, 'show']);
+    Route::delete('/unregister', [\App\Http\Controllers\UnregisterController::class, 'unregister']);
 });

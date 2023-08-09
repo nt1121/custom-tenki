@@ -33,7 +33,7 @@
                             <a class="p-header__nav-list-item-link" href="/weather/settings">設定</a>
                         </li>
                         <li class="p-header__nav-list-item">
-                            <form action="/logout" method="POST">
+                            <form action="/logout" method="POST" @submit="showPageLoading">
                                 @csrf
                                 <button type="submit" class="p-header__nav-list-item-link">ログアウト</button>
                             </form>

@@ -4,7 +4,6 @@ import helpers from '../helpers';
 export default {
   props: [
     'oldEmail',
-    'oldRemember',
     'emailInitialErrorMsg',
     'passwordInitialErrorMsg',
     'oldAgreeToTermsOfUse',

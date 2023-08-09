@@ -8,6 +8,7 @@ import AlertMessage from './Components/AlertMessage.vue';
 import PageLoading from './Components/PageLoading.vue';
 import PasswordResetRequest from './Components/PasswordResetRequest.vue';
 import PasswordReset from './Components/PasswordReset.vue';
+import UnregisterForm from './Components/UnregisterForm.vue';
 
 const app = createApp({
     data() {
@@ -40,5 +41,6 @@ app.component('input-password', InputPassword)
     .component('page-loading', PageLoading)
     .component('password-reset-request', PasswordResetRequest)
     .component('password-reset', PasswordReset)
+    .component('unregister-form', UnregisterForm)
     .use(store)
     .mount('#app');

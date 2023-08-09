@@ -136,4 +136,35 @@ END;
         $user->save();
         return $user;
     }
+
+    /**
+     * アカウントを削除する
+     *
+     * @param  int $userId
+     * @param  string $userEmail
+     * @return void
+     */
+    public function unregister(int $userId, string $userEmail)
+    {
+        try {
+            DB::beginTransaction();
+            User::destroy($userId);
+            $text = <<<END
+アカウントの削除が完了いたしました。
+
+※CustomTenkiに会員登録をした覚えがない場合は、お手数ですがこのメールを破棄くださいますようお願い申し上げます。
+END;
+            Mail::to($userEmail)->send(new NotificationMail('【CustomTenki】アカウントの削除', $text));
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error($e->getMessage());
+            return false;
+        }
+
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return true;
+    }
 }

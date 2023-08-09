@@ -10,7 +10,7 @@
         @elseif (auth()->check())
             <a href="/weather" class="p-hamburger-menu__link">ホーム</a>
             <a href="/weather/settings" class="p-hamburger-menu__link">設定</a>
-            <form action="/logout" method="POST">
+            <form action="/logout" method="POST" @submit="showPageLoading">
                 @csrf
                 <button type="submit" class="p-hamburger-menu__link">ログアウト</button>
             </form>
