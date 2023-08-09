@@ -71,14 +71,14 @@ export default {
       </div>
       <div class="u-mb-20">
         <h2 class="p-settings__heading">メールアドレス</h2>
-        <p class="u-mb-20">{{ user ? user.email : '' }}</p>
+        <p v-if="!user.is_test_user" class="u-mb-20">{{ user ? user.email : '' }}</p>
         <p v-if="user.is_test_user" class="p-settings__test-user-error">テストユーザーのメールアドレスは変更できません。</p>
         <router-link v-else to="/weather/settings/email" class="c-button">メールアドレスの変更</router-link>
       </div>
       <div class="u-mb-20">
         <h2 class="p-settings__heading">パスワード</h2>
         <p v-if="user.is_test_user" class="p-settings__test-user-error">テストユーザーのパスワードは変更できません。</p>
-        <button v-else type="button" class="c-button">パスワードの変更</button>
+        <router-link v-else to="/weather/settings/password" class="c-button">パスワードの変更</router-link>
       </div>
       <div class="u-mb-20">
         <h2 class="p-settings__heading">アカウント</h2>

@@ -3,7 +3,7 @@
         @if (!empty($isWeather))
             <router-link class="p-hamburger-menu__link" to="/weather" @click="toggleHamburgerMenu">ホーム</router-link>
             <router-link class="p-hamburger-menu__link" to="/weather/settings" @click="toggleHamburgerMenu">設定</router-link>
-            <form action="/logout" method="POST">
+            <form action="/logout" method="POST" @submit="showPageLoading">
                 @csrf
                 <button type="submit" class="p-hamburger-menu__link">ログアウト</button>
             </form>

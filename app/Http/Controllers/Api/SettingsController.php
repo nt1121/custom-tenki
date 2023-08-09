@@ -73,7 +73,9 @@ class SettingsController extends Controller
 
     public function getPasswordChangeData()
     {
-
+        return response()->json([
+            'user' => $this->userService->getUserStoreState(Auth::user()),
+        ]);
     }
 
 }

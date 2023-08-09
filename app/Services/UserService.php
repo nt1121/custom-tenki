@@ -122,4 +122,18 @@ END;
         $user->save();
         return $user;
     }
+
+    /**
+     * 会員のパスワードを更新する
+     *
+     * @param  App\Models\User $user
+     * @param  string $newPassword 新しいパスワード
+     * @return App\Models\User
+     */
+    public function updatePassword(User $user, string $newPassword)
+    {
+        $user->password = Hash::make($newPassword);
+        $user->save();
+        return $user;
+    }
 }

@@ -20,7 +20,7 @@
                             <router-link class="p-header__nav-list-item-link" to="/weather/settings">設定</router-link>
                         </li>
                         <li class="p-header__nav-list-item">
-                            <form action="/logout" method="POST">
+                            <form action="/logout" method="POST" @submit="showPageLoading">
                                 @csrf
                                 <button type="submit" class="p-header__nav-list-item-link">ログアウト</button>
                             </form>

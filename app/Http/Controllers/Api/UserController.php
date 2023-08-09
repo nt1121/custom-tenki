@@ -8,6 +8,8 @@ use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Api\UsersEmailPostRequest;
 use App\Services\EmailChangeService;
+use App\Http\Requests\Api\UsersPasswordPatchRequest;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -46,8 +48,18 @@ class UserController extends Controller
     /**
      *
      */
-    public function updatePassword()
+    public function updatePassword(UsersPasswordPatchRequest $request)
     {
+        $loginUser = Auth::user();
 
+        if (!Hash::check($request->password, $loginUser->password)) {
+            return response()->json([
+                'status' => 400,
+                'errors' => ['password' => ['パスワードが間違っています。']],
+            ], 400);
+        }
+
+        $this->userService->updatePassword($loginUser, $request->new_password);
+        return response()->json(['status' => 200]);
     }
 }

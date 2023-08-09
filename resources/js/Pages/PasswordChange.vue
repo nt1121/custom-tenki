@@ -7,9 +7,10 @@ export default {
       loading: true,
       isError: null,
       tooManyRequests: null,
-      itemsToDisplay: [],
-      email: '',
-      emailErrorMsg: '',
+      password: '',
+      passwordErrorMsg: '',
+      newPassword: '',
+      newPasswordErrorMsg: '',
       waitingForResponse: null,
     }
   },
@@ -23,7 +24,7 @@ export default {
   },
   methods: {
     getData() {
-      axios.get('/api/settings/email_change')
+      axios.get('/api/settings/password_change')
         .then(response => {
           if (response.data && response.data.user) {
             // テストユーザーの場合は設定画面に戻る
@@ -53,14 +54,10 @@ export default {
         });
     },
     validate() {
-      this.emailErrorMsg = helpers.validateEmail(this.email);
+      this.passwordErrorMsg = helpers.validatePassword(this.password);
+      this.newPasswordErrorMsg = helpers.validatePassword(this.newPassword);
 
-      if (this.emailErrorMsg.length) {
-        return false;
-      }
-
-      if (this.email.trim() === this.user.email) {
-        this.emailErrorMsg = '現在のメールアドレスと同じです。';
+      if (this.passwordErrorMsg.length || this.newPasswordErrorMsg.length) {
         return false;
       }
 
@@ -78,9 +75,11 @@ export default {
       this.waitingForResponse = true;
       this.$store.commit('common/showPageLoading');
       let isError = null;
-      axios.post('/api/users/email', {
+      axios.post('/api/users/password', {
+        _method: 'PATCH',
         user_id: this.user.id,
-        email: this.email
+        password: this.password,
+        new_password: this.newPassword
       })
         .then(response => {
           if (!response.data || !response.data.status || response.data.status !== 200) {
@@ -90,17 +89,23 @@ export default {
         .catch(error => {
           isError = true;
 
-          if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.email && error.response.data.errors.email[0]) {
-            this.emailErrorMsg = error.response.data.errors.email[0];
+          if (error.response && error.response.data && error.response.data.errors) {
+            if (error.response.data.errors.password && error.response.data.errors.password[0]) {
+              this.passwordErrorMsg = error.response.data.errors.password[0];
+            }
+
+            if (error.response.data.errors.new_password && error.response.data.errors.new_password[0]) {
+              this.newPasswordErrorMsg = error.response.data.errors.new_password[0];
+            }
           }
         })
         .finally(() => {
           this.$store.commit('common/hidePageLoading');
 
           if (isError) {
-            this.$store.commit('common/showAlertMessage', { msg: '情報の登録に失敗しました。', type: 'error' });
+            this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' });
           } else {
-            this.$store.commit('common/showAlertMessage', { msg: '確認メールを送信しました。', type: 'success' });
+            this.$store.commit('common/showAlertMessage', { msg: 'パスワードを変更しました。', type: 'success' });
             this.$router.push('/weather/settings');
           }
 
@@ -120,18 +125,19 @@ export default {
     <p v-else-if="!loading && isError">情報の取得に失敗しました。</p>
     <div v-else-if="!loading">
       <h1 class="c-page-heading c-page-heading--with-left-arrow"> <router-link to="/weather/settings">
-          <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow"></router-link>メールアドレスの変更</h1>
-      <p class="u-mb-20">
-        新しいメールアドレス宛に確認メールを送信します。<br>
-        メールアドレスの確認の完了と同時にメールアドレスの変更が完了します。
-      </p>
+          <img src="/img/left_arrow.png" alt="戻る" class="c-page-heading__left-arrow"></router-link>パスワードの変更</h1>
       <div class="u-mb-20">
-        <label class="c-form__label">新しいメールアドレス</label>
-        <input class="c-form__input-text" :class="{ 'c-form__input-text--error': emailErrorMsg }" type="text"
-          maxlength="150" v-model="email" name="email" required>
-        <div class="c-form__input-text-error-msg" v-show="emailErrorMsg">{{ emailErrorMsg }}</div>
+        <label class="c-form__label">現在のパスワード</label>
+        <input-password name="password" v-model="password" :error-msg="passwordErrorMsg" place-holder=""
+          :is-required="true"></input-password>
       </div>
-      <button type="submit" class="c-button c-button--primary" :disabled="waitingForResponse" @click="submit">送信</button>
+      <div class="u-mb-20">
+        <label class="c-form__label">新しいパスワード</label>
+        <input-password name="new_password" v-model="newPassword" :error-msg="newPasswordErrorMsg"
+          place-holder="半角英数8~255文字" :is-required="true"></input-password>
+      </div>
+      <button type="submit" class="c-button c-button--primary" :disabled="waitingForResponse"
+        @click="submit">パスワードを変更</button>
     </div>
   </transition>
 </template>

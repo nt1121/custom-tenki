@@ -82,7 +82,7 @@ export default {
                     if (isError) {
                         this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' });
                     } else {
-                        this.$store.commit('common/showAlertMessage', { msg: '地域を設定しました。', type: 'success' });
+                        this.$store.commit('common/showAlertMessage', { msg: '表示する項目を設定しました。', type: 'success' });
                         this.$router.push('/weather/settings');
                     }
                 });
