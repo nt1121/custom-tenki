@@ -8,6 +8,8 @@ class TermsController extends Controller
 {
     /**
      * 利用規約の表示
+     * 
+     * @return Illuminate\View\View
      */
     public function index(): View
     {

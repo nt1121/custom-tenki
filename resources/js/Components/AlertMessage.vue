@@ -5,8 +5,8 @@ export default {
         'initialType'
     ],
     computed: {
-        alertMessage() {
-            return this.$store.getters['common/alertMessage'];
+        alertMessages() {
+            return this.$store.getters['common/alertMessages'];
         }
     },
     methods: {
@@ -23,10 +23,9 @@ export default {
 </script>
 
 <template>
-    <div v-if="alertMessage" class="p-alert-message"
+    <!-- 配列にしてv-forで表示する -->
+    <div v-for="alertMessage in alertMessages" :key="alertMessage.id" class="p-alert-message"
         :class="{ 'p-alert-message--success': alertMessage.type === 'success', 'p-alert-message--error': alertMessage.type === 'error' }">
         {{ alertMessage.msg }}<div class="p-alert-message__close-button" @click="hide"></div>
     </div>
 </template>
-
-

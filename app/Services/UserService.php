@@ -20,9 +20,9 @@ class UserService
      *
      * @param  string $email 登録する会員のメールアドレス
      * @param  string $password 登録する会員のパスワード
-     * @return bool
+     * @return App\Models\User|bool
      */
-    public function register(string $email, string $password)
+    public function register(string $email, string $password): User | bool
     {
         try {
             DB::beginTransaction();
@@ -49,7 +49,7 @@ END;
             return false;
         }
 
-        return true;
+        return $user;
     }
 
     /**
@@ -57,9 +57,9 @@ END;
      *
      * @param  App\Models\User $user
      * @param  int $userRegisterTokenId 削除する会員登録用トークンのID
-     * @return bool
+     * @return App\Models\User|bool
      */
-    public function completeRegistration(User $user, int $userRegisterTokenId)
+    public function completeRegistration(User $user, int $userRegisterTokenId): User | bool
     {
         try {
             DB::beginTransaction();
@@ -83,7 +83,7 @@ END;
 
         Auth::login($user);
         request()->session()->regenerate();
-        return true;
+        return $user;
     }
 
     /**
@@ -92,7 +92,7 @@ END;
      * @param  App\Models\User $user
      * @return array
      */
-    public function getUserStoreState(User $user)
+    public function getUserStoreState(User $user): array
     {
         $area = null;
 
@@ -116,7 +116,7 @@ END;
      * @param  int $areaId 新しいエリアID
      * @return App\Models\User
      */
-    public function updateAreaId(User $user, int $areaId)
+    public function updateAreaId(User $user, int $areaId): User
     {
         $user->area_id = $areaId;
         $user->save();
@@ -130,7 +130,7 @@ END;
      * @param  string $newPassword 新しいパスワード
      * @return App\Models\User
      */
-    public function updatePassword(User $user, string $newPassword)
+    public function updatePassword(User $user, string $newPassword): User
     {
         $user->password = Hash::make($newPassword);
         $user->save();
@@ -144,7 +144,7 @@ END;
      * @param  string $userEmail
      * @return void
      */
-    public function unregister(int $userId, string $userEmail)
+    public function unregister(int $userId, string $userEmail): bool
     {
         try {
             DB::beginTransaction();

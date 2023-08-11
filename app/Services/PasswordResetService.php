@@ -17,15 +17,15 @@ class PasswordResetService
      *
      * @param  int $userId 会員ID
      * @param  string $email 会員のメールアドレス
-     * @return bool
+     * @return App\Models\PasswordResetRequest|bool
      */
-    public function createRequest(int $userId, string $email)
+    public function createRequest(int $userId, string $email): PasswordResetRequest | bool
     {
         try {
             DB::beginTransaction();
             $token = \Common::generateConfirmationUrlToken($userId);
             $expiresAt = new Carbon('+24 hours');
-            PasswordResetRequest::updateOrCreate(['user_id' => $userId], ['token' => $token, 'expires_at' => $expiresAt->format('Y-m-d H:i:s')]);
+            $passwordResetRequest = PasswordResetRequest::updateOrCreate(['user_id' => $userId], ['token' => $token, 'expires_at' => $expiresAt->format('Y-m-d H:i:s')]);
             $url = config('app.url') . '/password_reset/' . $token;
             $text = <<<END
 パスワードの再設定画面よりパスワードの再設定の申請を受付けました。
@@ -45,7 +45,7 @@ END;
             return false;
         }
 
-        return true;
+        return $passwordResetRequest;
     }
 
     /**
@@ -56,7 +56,7 @@ END;
      * @param  int $passwordResetRequestId 削除するパスワード変更申請のID
      * @return App\Models\User|bool
      */
-    public function reset(User $user, string $password, int $passwordResetRequestId)
+    public function reset(User $user, string $password, int $passwordResetRequestId): User | bool
     {
         try {
             DB::beginTransaction();

@@ -59,7 +59,7 @@ export default {
     </div>
     <div class="u-mb-20">
       <input type="checkbox" name="remember" value="1" class="c-form__input-checkbox" id="login-remember-checkbox"
-        v-model="remember"><label for="login-remember-checkbox" class="c-form__input-checkbox-label">ログイン状態を保持する</label>
+        v-model="remember"><label for="login-remember-checkbox" class="c-form__input-checkbox-label">ログインしたままにする</label>
     </div>
     <div class="u-mb-20">
       <a href="/password_reset/request">パスワードをお忘れの方はこちら</a>

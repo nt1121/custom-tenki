@@ -2,30 +2,29 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
-use App\Models\EmailChangeRequest;
 use App\Mail\NotificationMail;
+use App\Models\EmailChangeRequest;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class EmailChangeService
 {
     /**
      * メールアドレス変更申請を作成する
-     * 
+     *
      * @param  int $userId 会員ID
      * @param  string $email 新しいメールアドレス
-     * @return bool
+     * @return App\Models\EmailChangeRequest|bool
      */
-    public function createRequest(int $userId, string $email)
+    public function createRequest(int $userId, string $email): EmailChangeRequest | bool
     {
         try {
             DB::beginTransaction();
             $token = \Common::generateConfirmationUrlToken($userId);
             $expiresAt = new Carbon('+24 hours');
-            EmailChangeRequest::updateOrCreate(['user_id' => $userId], ['email' => $email, 'token' => $token, 'expires_at' => $expiresAt->format('Y-m-d H:i:s')]);
+            $emailChangeRequest = EmailChangeRequest::updateOrCreate(['user_id' => $userId], ['email' => $email, 'token' => $token, 'expires_at' => $expiresAt->format('Y-m-d H:i:s')]);
             $url = config('app.url') . '/email_change/' . $token;
             $text = <<<END
 メールアドレスの変更画面よりメールアドレス変更の申請を受付けました。
@@ -45,18 +44,18 @@ END;
             return false;
         }
 
-        return true;
+        return $emailChangeRequest;
     }
 
     /**
      * 会員のメールアドレスを変更する
-     * 
+     *
      * @param  App\Models\User $user
      * @param  string $email 新しいメールアドレス
      * @param  int $emailChangeRequestId 削除するメールアドレス変更申請のID
      * @return App\Models\User|bool
      */
-    public function changeUserEmail(User $user, string $email, int $emailChangeRequestId)
+    public function changeUserEmail(User $user, string $email, int $emailChangeRequestId): User | bool
     {
         try {
             DB::beginTransaction();

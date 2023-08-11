@@ -9,7 +9,13 @@ use Illuminate\Support\Arr;
 
 class WeatherForecastItemService
 {
-    public function getWeatherForecastItemsToDisplayByUser(User $user)
+    /**
+     * ユーザーが表示する天気予報の項目の配列を取得する
+     * 
+     * @param  App\Models\User $user
+     * @return array
+     */
+    public function getWeatherForecastItemsToDisplayByUser(User $user): array
     {
         $result = [];
         $items = $user->weatherForecastItems->toArray();
@@ -21,7 +27,13 @@ class WeatherForecastItemService
         return $result;
     }
 
-    public function getWeatherForecastItemsToHideByUser(User $user)
+    /**
+     * ユーザーが表示しない天気予報の項目の配列を取得する
+     * 
+     * @param  App\Models\User $user
+     * @return array
+     */
+    public function getWeatherForecastItemsToHideByUser(User $user): array
     {
         $result = [];
         $itemIdsToDisplay = $user->weatherForecastItems->pluck('id')->toArray();

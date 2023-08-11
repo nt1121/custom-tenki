@@ -12,10 +12,12 @@
                 <div class="p-top__cover-inner">
                     <h1 class="p-top__site-name">CustomTenki</h1>
                     <p class="p-top__site-description">表示する項目などがカスタマイズできる天気予報です。</p>
+                    @if (config('const.test_user_login_enabled'))
                     <form action="/test_user_login" method="POST" class="p-top__button-wrapper" @submit="showPageLoading">
                         @csrf
                         <button type="submit" class="c-button c-button--primary p-top__button">テストユーザーとしてログイン</button>
                     </form>
+                    @endif
                     <div class="p-top__button-wrapper">
                         <a href="/login" class="c-button c-button--primary p-top__button">ログイン</a>
                     </div>

@@ -9,7 +9,15 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class WeatherForecastService
 {
-    public function getWeatherForecast($areaId, $latitude, $longitude)
+    /**
+     * 緯度と軽度でAPIから天気予報を取得する。キャッシュされている場合はキャッシュから取得する。
+     * 
+     * @param  int  $areaId 地域ID
+     * @param  string $latitude 緯度
+     * @param  string $longitude 軽度
+     * @return array|bool
+     */
+    public function getWeatherForecast(int $areaId, string $latitude, string $longitude): array | bool
     {
         // キャッシュが存在する場合はキャッシュから取得
         $cacheKey = 'weather_forecast_data_area_id_' . $areaId;
@@ -60,7 +68,13 @@ class WeatherForecastService
         return $result;
     }
 
-    public function convertWindDegToText(int $deg)
+    /**
+     * 風向の角度を文字列の表現に変換する
+     * 
+     * @param  int $deg 風向（角度）
+     * @return string
+     */
+    public function convertWindDegToText(int $deg): string
     {
         if ($deg < 11.25) {
             return '北';
@@ -101,7 +115,13 @@ class WeatherForecastService
         }
     }
 
-    public function getDayOfWeekText(int $dayOfWeek)
+    /**
+     * 曜日の数値をかっこ付きの文字列の表現にして返す
+     * 
+     * @param  int $dayOfWeek
+     * @return string
+     */
+    public function getDayOfWeekText(int $dayOfWeek): string
     {
         $daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -112,7 +132,14 @@ class WeatherForecastService
         return '';
     }
 
-    public function formatDataFromApi(User $user, array $data)
+    /**
+     * APIから取得した天気予報のデータをホーム画面に表示する形式に整える
+     * 
+     * @param  App\Models\User $user
+     * @patam  array $data
+     * @return array
+     */
+    public function formatDataFromApi(User $user, array $data): array
     {
         $result = [];
         $limit = new Carbon('+4 days');

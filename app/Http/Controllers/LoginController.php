@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\LoginPostRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\TestUserLoginPostRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LoginController extends Controller
 {
     /**
      * ログインページの表示
+     *
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
-    public function show(): View|RedirectResponse
+    public function show(): View | RedirectResponse
     {
         if (Auth::check()) {
             return redirect('/weather');
@@ -26,13 +28,16 @@ class LoginController extends Controller
 
     /**
      * ログイン
+     * 
+     * @param  App\Http\Requests\LoginPostRequest $request
+     * @return Illuminate\Http\RedirectResponse
      */
     public function login(LoginPostRequest $request): RedirectResponse
     {
         if (Auth::attempt([
-            'email' => $request->email, 
-            'password' => $request->password, 
-            fn (Builder $query) => $query->whereNotNull('email_verified_at'),
+            'email' => $request->email,
+            'password' => $request->password,
+            fn(Builder $query) => $query->whereNotNull('email_verified_at'),
         ], $request->input('remember', false))) {
             $request->session()->regenerate();
             return redirect()->intended('/weather');
@@ -44,8 +49,11 @@ class LoginController extends Controller
 
     /**
      * テストユーザーとしてログイン
+     * 
+     * @param  App\Http\Requests\TestUserLoginPostRequest $request
+     * @return Illuminate\Http\RedirectResponse
      */
-    public function loginAsTestUser(Request $request): RedirectResponse
+    public function loginAsTestUser(TestUserLoginPostRequest $request): RedirectResponse
     {
         $testUser = User::where('is_test_user', true)->first();
 

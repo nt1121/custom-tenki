@@ -29,14 +29,14 @@ Route::post('/logout', [\App\Http\Controllers\LogoutController::class, 'logout']
 // 新規会員登録
 Route::get('/register', [\App\Http\Controllers\RegisterController::class, 'show']);
 Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register']);
-Route::get('/register/{token}', [\App\Http\Controllers\RegisterController::class, 'complete']);
+Route::get('/register/{token}', [\App\Http\Controllers\RegisterController::class, 'complete'])->where('token', '[0-9a-zA-Z\-]{38,255}');
 // パスワードの再設定
 Route::get('/password_reset/request', [\App\Http\Controllers\PasswordResetController::class, 'showRequestPage']);
 Route::post('/password_reset/request', [\App\Http\Controllers\PasswordResetController::class, 'request']);
-Route::get('/password_reset/{token}', [\App\Http\Controllers\PasswordResetController::class, 'showResetPage']);
+Route::get('/password_reset/{token}', [\App\Http\Controllers\PasswordResetController::class, 'showResetPage'])->where('token', '[0-9a-zA-Z\-]{38,255}');
 Route::patch('/password_reset', [\App\Http\Controllers\PasswordResetController::class, 'reset']);
 // メールアドレスの変更
-Route::get('/email_change/{token}', [\App\Http\Controllers\EmailChangeController::class, 'changeUserEmail']);
+Route::get('/email_change/{token}', [\App\Http\Controllers\EmailChangeController::class, 'changeUserEmail'])->where('token', '[0-9a-zA-Z\-]{38,255}');
 
 Route::middleware(['auth', 'verified:login'])->group(function () {
     // SPAからリクエストするAPIのルート

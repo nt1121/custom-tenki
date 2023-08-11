@@ -8,6 +8,8 @@ class PrivacyController extends Controller
 {
     /**
      * プライバシーポリシーの表示
+     * 
+     * @return Illuminate\View\View
      */
     public function index(): View
     {

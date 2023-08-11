@@ -75,6 +75,7 @@ export default {
       this.waitingForResponse = true;
       this.$store.commit('common/showPageLoading');
       let isError = null;
+      let isValidationError = null;
       axios.post('/api/users/password', {
         _method: 'PATCH',
         user_id: this.user.id,
@@ -91,10 +92,12 @@ export default {
 
           if (error.response && error.response.data && error.response.data.errors) {
             if (error.response.data.errors.password && error.response.data.errors.password[0]) {
+              isValidationError = true;
               this.passwordErrorMsg = error.response.data.errors.password[0];
             }
 
             if (error.response.data.errors.new_password && error.response.data.errors.new_password[0]) {
+              isValidationError = true;
               this.newPasswordErrorMsg = error.response.data.errors.new_password[0];
             }
           }
@@ -102,7 +105,8 @@ export default {
         .finally(() => {
           this.$store.commit('common/hidePageLoading');
 
-          if (isError) {
+          if (isValidationError) {
+          } else if (isError) {
             this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' });
           } else {
             this.$store.commit('common/showAlertMessage', { msg: 'パスワードを変更しました。', type: 'success' });

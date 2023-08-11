@@ -10,6 +10,9 @@ class LogoutController extends Controller
 {
     /**
      * ログアウト
+     * 
+     * @param  Illuminate\Http\Request $request
+     * @return Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request): RedirectResponse
     {

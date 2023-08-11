@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,6 +11,8 @@ class UsersAreaIdPatchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -24,7 +26,7 @@ class UsersAreaIdPatchRequest extends FormRequest
             }
 
             // 一致しない場合はfalseを返す
-            if ((int)$this->user_id !== $loginUser->id) {
+            if ((int) $this->user_id !== $loginUser->id) {
                 return false;
             }
         }
@@ -47,8 +49,12 @@ class UsersAreaIdPatchRequest extends FormRequest
 
     /**
      * エラー時にJSONのレスポンスを返す
+     *
+     * @param  Illuminate\contracts\Validation\Validator $validator
+     * @return void
      */
-    protected function failedValidation(Validator $validator) {
+    protected function failedValidation(Validator $validator): void
+    {
         $res = response()->json([
             'status' => 400,
             'errors' => $validator->errors(),

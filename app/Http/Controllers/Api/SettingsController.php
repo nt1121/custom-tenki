@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\AreaGroupService;
 use App\Services\UserService;
 use App\Services\WeatherForecastItemService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class SettingsController extends Controller
@@ -19,8 +20,10 @@ class SettingsController extends Controller
 
     /**
      * 設定画面を表示するために必要な情報を取得する
+     *
+     * @return Illuminate\Http\JsonResponse
      */
-    public function getSettingsData()
+    public function getSettingsData(): JsonResponse
     {
         $loginUser = Auth::user();
         return response()->json([
@@ -31,11 +34,13 @@ class SettingsController extends Controller
 
     /**
      * 地域選択画面を表示するために必要な情報を取得する
+     *
+     * @param  stirng|null $id 地域グループID
+     * @return Illuminate\Http\JsonResponse
      */
-
-    public function getAreaSelectData(?string $id = null)
+    public function getAreaSelectData(?string $id = null): JsonResponse
     {
-        $id = is_null($id) ? null : (int)$id;
+        $id = is_null($id) ? null : (int) $id;
         $areaGroup = $this->areaGroupService->getAreaGroupAndChildren($id);
 
         if (!$areaGroup) {
@@ -53,8 +58,10 @@ class SettingsController extends Controller
 
     /**
      * 表示項目選択画面を表示するために必要な情報を取得する
+     *
+     * @return Illuminate\Http\JsonResponse
      */
-    public function getItemSelectData()
+    public function getItemSelectData(): JsonResponse
     {
         $loginUser = Auth::user();
         return response()->json([
@@ -64,18 +71,27 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function getEmailChangeData()
+    /**
+     * メールアドレス変更画面を表示するために必要な情報を取得する
+     *
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function getEmailChangeData(): JsonResponse
     {
         return response()->json([
             'user' => $this->userService->getUserStoreState(Auth::user()),
         ]);
     }
 
-    public function getPasswordChangeData()
+    /**
+     * パスワード変更画面を表示するために必要な情報を取得する
+     *
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function getPasswordChangeData(): JsonResponse
     {
         return response()->json([
             'user' => $this->userService->getUserStoreState(Auth::user()),
         ]);
     }
-
 }

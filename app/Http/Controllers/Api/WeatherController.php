@@ -7,6 +7,7 @@ use App\Services\UserService;
 use App\Services\WeatherForecastService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Http\JsonResponse;
 
 class WeatherController extends Controller
 {
@@ -16,7 +17,12 @@ class WeatherController extends Controller
     ) {
     }
 
-    public function getWeatherData()
+    /**
+     * ホーム画面を表示するために必要な情報を取得する
+     * 
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function getWeatherData(): JsonResponse
     {
         $loginUser = Auth::user();
 

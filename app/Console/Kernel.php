@@ -2,10 +2,13 @@
 
 namespace App\Console;
 
+use App\Mail\NotificationMail;
 use Carbon\Carbon;
+use DateTimeZone;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class Kernel extends ConsoleKernel
 {
@@ -23,7 +26,21 @@ class Kernel extends ConsoleKernel
                 ->whereNull('email_verified_at')
                 ->where('created_at', '<=', $twoDaysAgo)
                 ->delete();
-        })->dailyAt('2:00');
+        })
+            ->name('delete-members-without-email-authentication')
+            ->dailyAt('2:00')
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                // タスク失敗時
+                // システム管理者のメールアドレスが設定されている場合はシステム管理者に通知メールを送信する
+                if (config('const.system_admin_email_address')) {
+                    $text = <<<END
+メールアドレス未確認の会員レコードの削除バッチ処理が失敗しました。
+調査をお願いいたします。
+END;
+                    Mail::to(config('const.system_admin_email_address'))->send(new NotificationMail('【CustomTenki】バッチ処理が失敗しました', $text));
+                }
+            });
 
         $schedule->call(function () {
             $oneDayAgo = Carbon::parse('-1 day')->format('Y-m-d H:i:s');
@@ -31,7 +48,21 @@ class Kernel extends ConsoleKernel
             DB::table('user_register_tokens')
                 ->where('expires_at', '<=', $oneDayAgo)
                 ->delete();
-        })->dailyAt('2:15');
+        })
+            ->name('delete-expired-user-register-tokens')
+            ->dailyAt('2:15')
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                // タスク失敗時
+                // システム管理者のメールアドレスが設定されている場合はシステム管理者に通知メールを送信する
+                if (config('const.system_admin_email_address')) {
+                    $text = <<<END
+有効期限切れの新規会員登録時のトークンレコードの削除バッチ処理が失敗しました。
+調査をお願いいたします。
+END;
+                    Mail::to(config('const.system_admin_email_address'))->send(new NotificationMail('【CustomTenki】バッチ処理が失敗しました', $text));
+                }
+            });
 
         $schedule->call(function () {
             $oneDayAgo = Carbon::parse('-1 day')->format('Y-m-d H:i:s');
@@ -39,7 +70,21 @@ class Kernel extends ConsoleKernel
             DB::table('password_reset_requests')
                 ->where('expires_at', '<=', $oneDayAgo)
                 ->delete();
-        })->dailyAt('2:30');
+        })
+            ->name('delete-expired-password-reset-requests')
+            ->dailyAt('2:30')
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                // タスク失敗時
+                // システム管理者のメールアドレスが設定されている場合はシステム管理者に通知メールを送信する
+                if (config('const.system_admin_email_address')) {
+                    $text = <<<END
+有効期限切れのパスワード変更申請レコードの削除バッチ処理が失敗しました。
+調査をお願いいたします。
+END;
+                    Mail::to(config('const.system_admin_email_address'))->send(new NotificationMail('【CustomTenki】バッチ処理が失敗しました', $text));
+                }
+            });
 
         $schedule->call(function () {
             $oneDayAgo = Carbon::parse('-1 day')->format('Y-m-d H:i:s');
@@ -47,7 +92,21 @@ class Kernel extends ConsoleKernel
             DB::table('email_change_requests')
                 ->where('expires_at', '<=', $oneDayAgo)
                 ->delete();
-        })->dailyAt('2:45');
+        })
+            ->name('delete-expired-email-change-requests')
+            ->dailyAt('2:45')
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                // タスク失敗時
+                // システム管理者のメールアドレスが設定されている場合はシステム管理者に通知メールを送信する
+                if (config('const.system_admin_email_address')) {
+                    $text = <<<END
+有効期限切れのメールアドレス変更申請レコードの削除バッチ処理が失敗しました。
+調査をお願いいたします。
+END;
+                    Mail::to(config('const.system_admin_email_address'))->send(new NotificationMail('【CustomTenki】バッチ処理が失敗しました', $text));
+                }
+            });
     }
 
     /**
@@ -55,8 +114,17 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
+
+    /**
+     * スケジュールされたイベントで使用するデフォルトのタイムゾーン取得
+     */
+    protected function scheduleTimezone(): DateTimeZone | string | null
+    {
+        return 'Asia/Tokyo';
+    }
+
 }

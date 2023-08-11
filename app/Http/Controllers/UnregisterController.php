@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UnregisterDeleteRequest;
-use Illuminate\Support\Facades\Hash;
 use App\Services\UserService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class UnregisterController extends Controller
 {
@@ -16,9 +17,11 @@ class UnregisterController extends Controller
     }
 
     /**
+     * アカウント削除画面の表示
      * 
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
-    public function show()
+    public function show(): View | RedirectResponse
     {
         $loginUser = Auth::user();
 
@@ -30,9 +33,12 @@ class UnregisterController extends Controller
     }
 
     /**
+     * アカウントを削除する
      * 
+     * @param  App\Http\Requests\UnregisterDeleteRequest
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
-    public function unregister(UnregisterDeleteRequest $request)
+    public function unregister(UnregisterDeleteRequest $request): View | RedirectResponse
     {
         $loginUser = Auth::user();
 

@@ -6,22 +6,23 @@ use App\Http\Requests\PasswordResetPostRequest;
 use App\Http\Requests\PasswordResetRequestPostRequest;
 use App\Models\PasswordResetRequest;
 use App\Models\User;
+use App\Services\PasswordResetService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Services\PasswordResetService;
 
 class PasswordResetController extends Controller
 {
     public function __construct(
         protected PasswordResetService $passwordResetService
-    )
-    {
+    ) {
     }
 
     /**
      * パスワード再設定申請ページを表示する
+     * 
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
     public function showRequestPage(): View | RedirectResponse
     {
@@ -35,7 +36,8 @@ class PasswordResetController extends Controller
     /**
      * パスワードの変更を申請する
      *
-     * PasswordResetRequest
+     * @param  App\Http\Requests\PasswordResetRequestPostRequest $request
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
     public function request(PasswordResetRequestPostRequest $request): View | RedirectResponse
     {
@@ -59,14 +61,12 @@ class PasswordResetController extends Controller
 
     /**
      * トークンを確認し新しいパスワードの入力画面を表示
+     * 
+     * @param  string $token 確認URLのトークン
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
     public function showResetPage(string $token): View | RedirectResponse
     {
-        // トークンが長すぎる場合は不正なURL扱いにする
-        if (mb_strlen($token) > 255) {
-            return view('expired_url');
-        }
-
         $passwordResetRequest = PasswordResetRequest::where('token', $token)->where('expires_at', '>=', date('Y-m-d H:i:s'))->first();
 
         if (empty($passwordResetRequest)) {
@@ -94,6 +94,9 @@ class PasswordResetController extends Controller
 
     /**
      * パスワードをリセットする
+     * 
+     * @param  App\Http\Requests\PasswordResetPostRequest $request
+     * @return Illuminate\View\View|Illuminate\Http\RedirectResponse
      */
     public function reset(PasswordResetPostRequest $request): View | RedirectResponse
     {

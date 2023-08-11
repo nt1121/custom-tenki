@@ -11,6 +11,8 @@ class UsersPasswordPatchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * 
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -50,8 +52,11 @@ class UsersPasswordPatchRequest extends FormRequest
 
     /**
      * エラー時にJSONのレスポンスを返す
+     * 
+     * @param  Illuminate\contracts\Validation\Validator $validator
+     * @return void
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
         $res = response()->json([
             'status' => 400,

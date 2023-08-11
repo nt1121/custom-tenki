@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UsersAreaIdPatchRequest;
+use App\Http\Requests\Api\UsersEmailPostRequest;
+use App\Http\Requests\Api\UsersPasswordPatchRequest;
+use App\Services\EmailChangeService;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\Api\UsersEmailPostRequest;
-use App\Services\EmailChangeService;
-use App\Http\Requests\Api\UsersPasswordPatchRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -21,8 +22,11 @@ class UserController extends Controller
 
     /**
      * 会員の地域IDを更新する
+     * 
+     * @param 　App\Http\Requests\Api\UsersAreaIdPatchRequest $request
+     * @return Illuminate\Http\JsonResponse
      */
-    public function updateAreaId(UsersAreaIdPatchRequest $request)
+    public function updateAreaId(UsersAreaIdPatchRequest $request): JsonResponse
     {
         $user = $this->userService->updateAreaId(Auth::user(), $request->area_id);
         return response()->json([
@@ -32,8 +36,11 @@ class UserController extends Controller
 
     /**
      * メールアドレスの変更申請を登録する
+     * 
+     * @param  App\Http\Requests\Api\UsersEmailPostRequest $request
+     * @return Illuminate\Http\JsonResponse
      */
-    public function requestEmailChange(UsersEmailPostRequest $request)
+    public function requestEmailChange(UsersEmailPostRequest $request): JsonResponse
     {
         if (!$this->emailChangeService->createRequest($request->user_id, $request->email)) {
             return response()->json([
@@ -46,9 +53,12 @@ class UserController extends Controller
     }
 
     /**
-     *
+     * 会員のパスワードを更新する
+     * 
+     * @param  App\Http\Requests\Api\UsersPasswordPatchRequest $request
+     * @return Illuminate\Http\JsonResponse
      */
-    public function updatePassword(UsersPasswordPatchRequest $request)
+    public function updatePassword(UsersPasswordPatchRequest $request): JsonResponse
     {
         $loginUser = Auth::user();
 

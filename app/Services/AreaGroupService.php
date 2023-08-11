@@ -14,7 +14,7 @@ class AreaGroupService
      * @param  null|int $id 地域グループID
      * @return array|bool
      */
-    public static function getAreaGroupAndChildren(?int $id): array|bool
+    public static function getAreaGroupAndChildren(?int $id): array | bool
     {
         // キャッシュが存在する場合はキャッシュから取得
         $cacheKey = 'api_area_data_area_group_id_' . (is_null($id) ? 'null' : $id);
