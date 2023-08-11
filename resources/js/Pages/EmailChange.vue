@@ -78,6 +78,7 @@ export default {
       this.waitingForResponse = true;
       this.$store.commit('common/showPageLoading');
       let isError = null;
+      let isValidationError = null;
       axios.post('/api/users/email', {
         user_id: this.user.id,
         email: this.email
@@ -91,13 +92,15 @@ export default {
           isError = true;
 
           if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.email && error.response.data.errors.email[0]) {
+            isValidationError = true;
             this.emailErrorMsg = error.response.data.errors.email[0];
           }
         })
         .finally(() => {
           this.$store.commit('common/hidePageLoading');
 
-          if (isError) {
+          if (isValidationError) {
+          } else if (isError) {
             this.$store.commit('common/showAlertMessage', { msg: '情報の登録に失敗しました。', type: 'error' });
           } else {
             this.$store.commit('common/showAlertMessage', { msg: '確認メールを送信しました。', type: 'success' });
