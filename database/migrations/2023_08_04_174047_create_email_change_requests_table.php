@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('email', 150)->unique();
-            $table->string('token');
+            $table->string('token', 255);
             $table->dateTime('expires_at');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();

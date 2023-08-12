@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_register_tokens', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('token');
+            $table->string('token', 255);
             $table->dateTime('expires_at');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
