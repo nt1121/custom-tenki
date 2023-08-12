@@ -23,7 +23,6 @@ export default {
 </script>
 
 <template>
-    <!-- 配列にしてv-forで表示する -->
     <div v-for="alertMessage in alertMessages" :key="alertMessage.id" class="p-alert-message"
         :class="{ 'p-alert-message--success': alertMessage.type === 'success', 'p-alert-message--error': alertMessage.type === 'error' }">
         {{ alertMessage.msg }}<div class="p-alert-message__close-button" @click="hide"></div>
