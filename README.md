@@ -109,6 +109,3 @@ chmod -R 777 bootstrap/cache
 ```
 * * * * * cd （アプリケーションのルートディレクトリの絶対パスをこちらに設定してください） && php artisan schedule:run >> /dev/null 2>&1
 ```
-
-
-
