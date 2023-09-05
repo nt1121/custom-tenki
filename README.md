@@ -31,7 +31,7 @@ Laravel 10、Vue 3等を使用して作成しました。
 
 ## データベース設計
 
-[ER図](https://ct.nt1121.net/etc/er_diagram.png)
+[ER図](https://ct.nt1121.net/img/er_diagram.png)
 
 ## 動作確認済み環境
 
