@@ -5,6 +5,8 @@
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
+*.jpg -text
+*.png -text
 
 /.github export-ignore
 CHANGELOG.md export-ignore
