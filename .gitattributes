@@ -5,8 +5,8 @@
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
-*.jpg -text
-*.png -text
+*.jpg binary
+*.png binary
 
 /.github export-ignore
 CHANGELOG.md export-ignore
