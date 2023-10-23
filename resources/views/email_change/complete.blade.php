@@ -17,7 +17,7 @@
         </main>
         @include('include.footer')
     </div>
-    @vite('resources/js/app.js')
+    @vite('resources/js/app_non_spa.js')
 </body>
 
 </html>

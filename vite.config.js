@@ -6,7 +6,7 @@ import sassGlobImports from 'vite-plugin-sass-glob-import';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/scss/app.scss', 'resources/js/app.js', 'resources/js/app_weather.js'],
+            input: ['resources/scss/app.scss', 'resources/js/app_non_spa.js', 'resources/js/app_spa.js'],
             refresh: true,
         }),
         vue({

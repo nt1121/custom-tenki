@@ -23,7 +23,7 @@
             initial-type="{{ strval(session('alert.type')) }}"></alert-message>
         <page-loading></page-loading>
     </div>
-    @vite('resources/js/app.js')
+    @vite('resources/js/app_non_spa.js')
 </body>
 
 </html>

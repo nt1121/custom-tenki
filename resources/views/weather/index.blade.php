@@ -20,7 +20,7 @@
         <area-select-modal></area-select-modal>
         <page-loading></page-loading>
     </div>
-    @vite('resources/js/app_weather.js')
+    @vite('resources/js/app_spa.js')
 </body>
 
 </html>

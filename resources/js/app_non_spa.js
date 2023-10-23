@@ -1,11 +1,14 @@
 import './bootstrap';
 import { createApp } from 'vue/dist/vue.esm-bundler';
-import store from './Store/weather';
-import router from "./Router";
+import store from './Store/non_spa';
 import InputPassword from './Components/InputPassword.vue'
+import LoginForm from './Components/LoginForm.vue';
+import RegisterForm from './Components/RegisterForm.vue';
 import AlertMessage from './Components/AlertMessage.vue';
 import PageLoading from './Components/PageLoading.vue';
-import AreaSelectModal from './Components/AreaSelectModal.vue';
+import PasswordResetRequest from './Components/PasswordResetRequest.vue';
+import PasswordReset from './Components/PasswordReset.vue';
+import UnregisterForm from './Components/UnregisterForm.vue';
 
 const app = createApp({
     data() {
@@ -32,9 +35,12 @@ const app = createApp({
 });
 
 app.component('input-password', InputPassword)
+    .component('login-form', LoginForm)
+    .component('register-form', RegisterForm)
     .component('alert-message', AlertMessage)
     .component('page-loading', PageLoading)
-    .component('area-select-modal', AreaSelectModal)
+    .component('password-reset-request', PasswordResetRequest)
+    .component('password-reset', PasswordReset)
+    .component('unregister-form', UnregisterForm)
     .use(store)
-    .use(router)
     .mount('#app');
