@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.getters['weather/user'];
+      return this.$store.getters['spa/user'];
     }
   },
   mounted() {
@@ -32,7 +32,7 @@ export default {
               this.$router.push('/weather/settings');
             }
 
-            this.$store.commit('weather/setUser', response.data.user);
+            this.$store.commit('spa/setUser', response.data.user);
           } else {
             this.isError = true;
           }

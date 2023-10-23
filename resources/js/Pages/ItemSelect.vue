@@ -15,7 +15,7 @@ export default {
     },
     computed: {
         user() {
-            return this.$store.getters['weather/user'];
+            return this.$store.getters['spa/user'];
         }
     },
     mounted() {
@@ -37,7 +37,7 @@ export default {
             axios.get('/api/settings/item_select')
                 .then(response => {
                     if (response.data && response.data.user && response.data.items_to_display && response.data.items_to_hide) {
-                        this.$store.commit('weather/setUser', response.data.user);
+                        this.$store.commit('spa/setUser', response.data.user);
                         this.itemsToDisplay = response.data.items_to_display;
                         this.itemsToHide = response.data.items_to_hide;
                     } else {

@@ -17,7 +17,7 @@ export default {
       axios.get('/api/weather')
         .then(response => {
           if (response.data && response.data.user && response.data.area !== undefined && response.data.list !== undefined) {
-            this.$store.commit('weather/setUser', response.data.user);
+            this.$store.commit('spa/setUser', response.data.user);
 
             if (response.data.area && response.data.list) {
               this.area = response.data.area;

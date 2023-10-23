@@ -14,7 +14,7 @@ export default {
     },
     computed: {
         user() {
-            return this.$store.getters['weather/user'];
+            return this.$store.getters['spa/user'];
         }
     },
     mounted() {
@@ -26,7 +26,7 @@ export default {
             axios.get(url)
                 .then(response => {
                     if (response.data && response.data.user && response.data.area_group) {
-                        this.$store.commit('weather/setUser', response.data.user);
+                        this.$store.commit('spa/setUser', response.data.user);
                         this.list = response.data.area_group.children;
 
                         if (response.data.area_group) {
