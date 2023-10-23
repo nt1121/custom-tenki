@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\RateLimiter;
 class WeatherForecastService
 {
     /**
-     * 緯度と軽度でAPIから天気予報を取得する。キャッシュされている場合はキャッシュから取得する。
+     * 緯度と経度でAPIから天気予報を取得する。キャッシュされている場合はキャッシュから取得する。
      * 
      * @param  int  $areaId 地域ID
      * @param  string $latitude 緯度
-     * @param  string $longitude 軽度
+     * @param  string $longitude 経度
      * @return array|bool
      */
     public function getWeatherForecast(int $areaId, string $latitude, string $longitude): array | bool
