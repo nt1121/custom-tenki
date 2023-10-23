@@ -6,7 +6,15 @@ export default {
             isError: null,
             tooManyRequests: null,
             areaGroup: null,
-            list: []
+            list: [],
+            selectedAreaId: null,
+            selectedAreaName: null,
+            isModalVisible: false
+        }
+    },
+    computed: {
+        user() {
+            return this.$store.getters['weather/user'];
         }
     },
     mounted() {
@@ -45,8 +53,41 @@ export default {
                 });
         },
         showModal(id, name) {
-            this.$store.commit('weather/setSelectedArea', { id: id, name: name });
-            this.$store.commit('weather/showAreaSelectModal');
+            this.selectedAreaId = id;
+            this.selectedAreaName = name;
+            this.isModalVisible = true;
+        },
+        hideModal() {
+            this.isModalVisible = false;
+        },
+        updateUserAreaId() {
+            this.$store.commit('common/showPageLoading');
+            let isError = null;
+            axios.post('/api/users/area_id', {
+                _method: 'PATCH',
+                user_id: this.user.id,
+                area_id: this.selectedAreaId
+            })
+                .then(response => {
+                    if (response.data && response.data.user) {
+                        this.hideModal();
+                    } else {
+                        isError = true;
+                    }
+                })
+                .catch(error => {
+                    isError = true;
+                })
+                .finally(() => {
+                    this.$store.commit('common/hidePageLoading');
+
+                    if (isError) {
+                        this.$store.commit('common/showAlertMessage', { msg: '情報の更新に失敗しました。', type: 'error' });
+                    } else {
+                        this.$store.commit('common/showAlertMessage', { msg: '地域を設定しました。', type: 'success' });
+                        this.$router.push('/weather/settings');
+                    }
+                });
         }
     }
 }
@@ -90,4 +131,11 @@ export default {
             </div>
         </div>
     </transition>
+    <div class="p-modal" v-show="isModalVisible">
+        <div class="p-modal__window u-text-center">
+            <div class="u-mb-20">{{ selectedAreaName !== null ? selectedAreaName : '' }}を地域に設定しますか？</div>
+            <button type="button" class="c-button c-button--primary u-mr-10" @click="updateUserAreaId">設定する</button>
+            <button type="button" class="c-button" @click="hideModal">キャンセル</button>
+        </div>
+    </div>
 </template>

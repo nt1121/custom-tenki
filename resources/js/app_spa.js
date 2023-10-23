@@ -5,7 +5,6 @@ import router from "./Router";
 import InputPassword from './Components/InputPassword.vue'
 import AlertMessage from './Components/AlertMessage.vue';
 import PageLoading from './Components/PageLoading.vue';
-import AreaSelectModal from './Components/AreaSelectModal.vue';
 
 const app = createApp({
     data() {
@@ -34,7 +33,6 @@ const app = createApp({
 app.component('input-password', InputPassword)
     .component('alert-message', AlertMessage)
     .component('page-loading', PageLoading)
-    .component('area-select-modal', AreaSelectModal)
     .use(store)
     .use(router)
     .mount('#app');
