@@ -78,9 +78,7 @@ class WeatherForecastService
     {
         if ($deg < 11.25) {
             return '北';
-        }
-
-        if ($deg < 33.75) {
+        } elseif ($deg < 33.75) {
             return '北北東';
         } elseif ($deg < 56.25) {
             return '北東';
