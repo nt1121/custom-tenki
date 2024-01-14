@@ -31,11 +31,11 @@ class WeatherForecastService
      */
     public function makeRequestToThreeHourForecastApi(int $areaId, string $latitude, string $longitude) {
         // 一定時間内のリクエスト回数制限に達した場合はステータスコード429のエラーを返す
-        if (RateLimiter::tooManyAttempts('three-hour-forecast-api-request', $perMinute = config('const.weather_api.three_hour_forecast.max_requests_per_minute'))) {
+        if (RateLimiter::tooManyAttempts(config('const.weather_api.three_hour_forecast.rate_limit_key'), $perMinute = config('const.weather_api.three_hour_forecast.max_requests_per_minute'))) {
             abort(429);
         }
 
-        RateLimiter::hit('three-hour-forecast-api-request');
+        RateLimiter::hit(config('const.weather_api.three_hour_forecast.rate_limit_key'));
         $url = config('const.weather_api.three_hour_forecast.endpoint') . '?lat=' . $latitude . '&lon=' . $longitude . '&units=metric&cnt=40&lang=ja&appid=' . config('const.weather_api.api_key');
         $data = json_decode(file_get_contents($url), true);
 

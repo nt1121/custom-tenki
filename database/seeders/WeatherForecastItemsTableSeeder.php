@@ -13,6 +13,8 @@ class WeatherForecastItemsTableSeeder extends Seeder
      */
     public function run(): void
     {
+        WeatherForecastItem::truncate();
+
         $data = [
             ['name' => 'weather', 'display_name' => '天気', 'display_order' => 1],
             ['name' => 'temp', 'display_name' => '気温', 'display_order' => 2],

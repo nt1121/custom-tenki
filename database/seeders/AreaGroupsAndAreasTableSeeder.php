@@ -15,6 +15,9 @@ class AreaGroupsAndAreasTableSeeder extends Seeder
      */
     public function run(): void
     {
+        Area::truncate();
+        AreaGroup::truncate();
+
         $data = [
             ['name' => '北海道・東北地方', 'child' => [
                 ['name' => '北海道', 'child' => [

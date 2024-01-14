@@ -7,6 +7,7 @@ return [
             'endpoint' => 'https://api.openweathermap.org/data/2.5/forecast',
             'max_requests_per_minute' => 20, // １分間にAPIにリクエストできる最大回数
             'cache_key' => 'three_hour_forecast_data_area_id_',
+            'rate_limit_key' => 'three-hour-forecast-api-request',
         ],
     ],
     'system_admin_email_address' => env('SYSTEM_ADMIN_EMAIL_ADDRESS'),
