@@ -6,63 +6,149 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
 
 class WeatherForecastService
 {
     /**
-     * 緯度と経度でAPIから天気予報を取得する。キャッシュされている場合はキャッシュから取得する。
+     * ３時間天気予報のデータをキャッシュから取得する
+     * 
+     * @param  int  $areaId 地域ID
+     * @return array|null
+     */
+    public function getThreeHourForecastDataFromCache(int $areaId) {
+        $cacheKey = config('const.weather_api.three_hour_forecast.cache_key') . $areaId;
+        return Cache::get($cacheKey);
+    }
+
+    /**
+     * ３時間天気予報のAPIにリクエストする
      * 
      * @param  int  $areaId 地域ID
      * @param  string $latitude 緯度
      * @param  string $longitude 経度
      * @return array|bool
      */
-    public function getWeatherForecast(int $areaId, string $latitude, string $longitude): array | bool
-    {
-        // キャッシュが存在する場合はキャッシュから取得
-        $cacheKey = 'weather_forecast_data_area_id_' . $areaId;
-        $result = Cache::get($cacheKey);
+    public function makeRequestToThreeHourForecastApi(int $areaId, string $latitude, string $longitude) {
+        // 一定時間内のリクエスト回数制限に達した場合はステータスコード429のエラーを返す
+        if (RateLimiter::tooManyAttempts('three-hour-forecast-api-request', $perMinute = config('const.weather_api.three_hour_forecast.max_requests_per_minute'))) {
+            abort(429);
+        }
 
-        if (is_null($result)) {
-            if (RateLimiter::tooManyAttempts('weather-api-request', $perMinute = config('const.weather_api.max_requests_per_minute'))) {
-                abort(429);
+        RateLimiter::hit('three-hour-forecast-api-request');
+        $url = config('const.weather_api.three_hour_forecast.endpoint') . '?lat=' . $latitude . '&lon=' . $longitude . '&units=metric&cnt=40&lang=ja&appid=' . config('const.weather_api.api_key');
+        $data = json_decode(file_get_contents($url), true);
+
+        // APIのレスポンスのバリデーション
+        $validator = Validator::make($data, [
+            'list' => 'required|array',
+            'list.*.dt' => 'required|integer',
+            'list.*.main.temp' => 'required|numeric',
+            'list.*.main.humidity' => 'required|integer',
+            'list.*.weather.0.icon' => 'required|string',
+            'list.*.wind.speed' => 'required|numeric',
+            'list.*.wind.deg' => 'required|integer|min:0|max:360',
+            'list.*.pop' => 'required|numeric',
+            'list.*.rain.3h' => 'nullable|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            logger()->error('METHOD:' . __METHOD__ . ' LINE:' . __LINE__ . ' ３時間天気予報APIのレスポンスのバリデーションでエラーが発生しました。');
+            $errors = $validator->errors();
+            foreach ($errors->all() as $message) {
+                logger()->error($message);
+            }
+            return false;
+        }
+
+        // キャッシュに保存
+        $cacheKey = config('const.weather_api.three_hour_forecast.cache_key') . $areaId;
+        Cache::put($cacheKey, $data, 3600);
+        return $data;
+    }
+
+    /**
+     * 表示用の３時間天気予報のデータを作成する
+     * 
+     * @param  App\Models\User $user
+     * @patam  array $data ３時間天気予報APIのレスポンスの配列
+     * @return array
+     */
+    public function createThreeHourForecastDataForDisplay(User $user, array $data) {
+        // APIのレスポンスを加工する
+        $precessedData = [];
+
+        foreach ($data['list'] as $datum) {
+            $dt = Carbon::createFromTimestamp($datum['dt']);
+            $precessedData[] = [
+                'dt' => $datum['dt'],
+                'date_key' => $dt->format('Ymd'),
+                'date_text' => $dt->format('Y年m月d日') . $this->getDayOfWeekText($dt->dayOfWeek),
+                'hour' => $dt->format('H'),
+                'temp' => floor($datum['main']['temp']),
+                'humidity' => $datum['main']['humidity'],
+                'weather' => $datum['weather'][0]['icon'],
+                'wind' => [
+                    'speed' => $datum['wind']['speed'],
+                    'direction' => $this->convertWindDegToText($datum['wind']['deg']),
+                ],
+                'pop' => floor($datum['pop'] * 100),
+                'rain_3h' => $datum['rain']['3h'] ?? null,
+            ];
+        }
+
+        // 表示する項目の設定順に並べる
+        $result = [];
+        // 4日後の0時0分0秒。この日時以降のデータは表示しない。
+        $displayLimit = new Carbon('+4 days');
+        $displayLimit->setTime(0, 0, 0);
+        $itemsToDisplay = $user->weatherForecastItems;
+        $headers = array_merge(['時刻'], $itemsToDisplay->pluck('display_name')->toArray());
+        $itemNamesToDisplay = array_merge(['hour'], $itemsToDisplay->pluck('name')->toArray());
+        $now = time();
+
+        foreach ($precessedData as $datum) {
+            // 現在時刻以前の場合は表示しない
+            if ($datum['dt'] <= $now) {
+                continue;
             }
 
-            RateLimiter::hit('weather-api-request');
-            $url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' . $latitude . '&lon=' . $longitude . '&units=metric&cnt=40&lang=ja&appid=' . config('const.weather_api.api_key');
-            $data = json_decode(file_get_contents($url), true);
-
-            if (!isset($data['list'])) {
-                return false;
+            if ($datum['dt'] >= $displayLimit->timestamp) {
+                break;
             }
 
-            $result = [];
-
-            foreach ($data['list'] as $datum) {
-                if (!isset($datum['dt'])) {
-                    return false;
-                }
-
-                $dt = Carbon::createFromTimestamp($datum['dt']);
-                $result[] = [
-                    'dt' => $datum['dt'],
-                    'date_key' => $dt->format('Ymd'),
-                    'date_text' => $dt->format('Y年m月d日') . $this->getDayOfWeekText($dt->dayOfWeek),
-                    'hour' => $dt->format('H'),
-                    'temp' => isset($datum['main']['temp']) ? floor($datum['main']['temp']) : null,
-                    'humidity' => $datum['main']['humidity'] ?? null,
-                    'weather' => $datum['weather'][0]['icon'] ?? null,
-                    'wind' => [
-                        'speed' => $datum['wind']['speed'] ?? null,
-                        'direction' => isset($datum['wind']['deg']) ? $this->convertWindDegToText($datum['wind']['deg']) : null,
-                    ],
-                    'pop' => isset($datum['pop']) ? floor($datum['pop'] * 100) : null,
-                    'rain_3h' => $datum['rain']['3h'] ?? null,
+            if (!isset($result[$datum['date_key']])) {
+                $result[$datum['date_key']] = [
+                    'date_text' => $datum['date_text'],
+                    'headers' => $headers,
+                    'value_list' => [],
                 ];
             }
 
-            // キャッシュに保存
-            Cache::put($cacheKey, $result, 3600);
+            $values = [];
+
+            foreach ($itemNamesToDisplay as $itemName) {
+                $value = $datum[$itemName];
+
+                if ($itemName === 'hour') {
+                    $values[] = $value;
+                } elseif ($itemName === 'weather') {
+                    $values[] = '<img class="p-wheather-forecast__table-td-icon" src="https://openweathermap.org/img/wn/' . $value . '.png" alt="天気">';
+                } elseif ($itemName === 'temp') {
+                    $values[] = $value . '℃';
+                } elseif ($itemName === 'pop' || $itemName === 'humidity') {
+                    $values[] = $value . '%';
+                } elseif ($itemName === 'rain_3h') {
+                    $values[] = is_null($value) ? '0mm/3h' : ($value . 'mm/3h');
+                } elseif ($itemName === 'wind') {
+                    $values[] = $value['speed'] . 'm/s<br>' . $value['direction'];
+                } else {
+                    // 不明な項目の場合は空欄
+                    $values[] = '';
+                }
+            }
+
+            $result[$datum['date_key']]['value_list'][] = $values;
         }
 
         return $result;
@@ -128,69 +214,5 @@ class WeatherForecastService
         }
 
         return '';
-    }
-
-    /**
-     * APIから取得した天気予報のデータをホーム画面に表示する形式に整える
-     * 
-     * @param  App\Models\User $user
-     * @patam  array $data
-     * @return array
-     */
-    public function formatDataFromApi(User $user, array $data): array
-    {
-        $result = [];
-        $limit = new Carbon('+4 days');
-        $limit->setTime(0, 0, 0);
-        $itemsToDisplay = $user->weatherForecastItems;
-        $headers = array_merge(['時刻'], $itemsToDisplay->pluck('display_name')->toArray());
-        $itemNamesToDisplay = array_merge(['hour'], $itemsToDisplay->pluck('name')->toArray());
-
-        foreach ($data as $datum) {
-            if ($datum['dt'] >= $limit->timestamp) {
-                // 現在日から４日後以降は表示しない
-                break;
-            }
-
-            if ($datum['dt'] <= time()) {
-                // 現在時刻以前の場合は表示しない
-                continue;
-            }
-
-            if (!isset($result[$datum['date_key']])) {
-                $result[$datum['date_key']] = [
-                    'date_text' => $datum['date_text'],
-                    'headers' => $headers,
-                    'value_list' => [],
-                ];
-            }
-
-            $tmp = [];
-
-            foreach ($itemNamesToDisplay as $itemName) {
-                $value = $datum[$itemName];
-
-                if ($itemName === 'hour') {
-                    $tmp[] = $value;
-                } elseif ($itemName === 'weather') {
-                    $tmp[] = '<img class="p-wheather-forecast__table-td-icon" src="https://openweathermap.org/img/wn/' . $value . '.png" alt="天気">';
-                } elseif ($itemName === 'temp') {
-                    $tmp[] = $value . '℃';
-                } elseif ($itemName === 'pop' || $itemName === 'humidity') {
-                    $tmp[] = $value . '%';
-                } elseif ($itemName === 'rain_3h') {
-                    $tmp[] = is_null($value) ? '0mm/3h' : ($value . 'mm/3h');
-                } elseif ($itemName === 'wind') {
-                    $tmp[] = $value['speed'] . 'm/s<br>' . $value['direction'];
-                } else {
-                    // 不明な項目の場合は空欄
-                    $tmp[] = '';
-                }
-            }
-
-            $result[$datum['date_key']]['value_list'][] = $tmp;
-        }
-
-        return $result;
     }
 }

@@ -43,18 +43,26 @@ class WeatherController extends Controller
             ], 404);
         }
 
-        $data = $this->weatherForecastService->getWeatherForecast($area->id, $area->latitude, $area->longitude);
+        // キャッシュからAPIのレスポンスを取得する
+        $data = $this->weatherForecastService->getThreeHourForecastDataFromCache($area->id);
 
-        if (!$data) {
-            abort(400);
+        // キャッシュされていなかった場合はAPIにリクエストする
+        if (is_null($data)) {
+            $data = $this->weatherForecastService->makeRequestToThreeHourForecastApi($area->id, $area->latitude, $area->longitude);
         }
 
-        $list = $this->weatherForecastService->formatDataFromApi($loginUser, $data);
+        // APIから天気予報データが取得できなかった場合
+        if (!$data) {
+            return response()->json([
+                'status' => 400,
+                'errors' => ['天気予報データが取得できませんでした。'],
+            ], 400);
+        }
 
         return response()->json([
             'user' => $this->userService->getUserStoreState(Auth::user()),
             'area' => Arr::only($area->toArray(), ['id', 'name']),
-            'list' => $list, 
+            'list' => $this->weatherForecastService->createThreeHourForecastDataForDisplay($loginUser, $data)
         ]);
     }
 }
