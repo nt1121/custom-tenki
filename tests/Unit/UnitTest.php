@@ -262,4 +262,31 @@ class UnitTest extends TestCase
         $user2 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
         $this->assertFalse($emailChangeService->changeUserEmail($user2, config('const.test_user_email2'), $emailChangeRequestId));
     }
+
+    /**
+     * Commonの各メソッドの単体テスト
+     */
+    public function test_common(): void
+    {
+        $uuid = \Common::generateConfirmationUrlToken(1);
+        $this->assertIsString($uuid);
+        $this->assertTrue(Str::startsWith($uuid, '1-'));
+        $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+        $uuid = \Common::generateConfirmationUrlToken(9);
+        $this->assertIsString($uuid);
+        $this->assertTrue(Str::startsWith($uuid, '9-'));
+        $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+        $uuid = \Common::generateConfirmationUrlToken(10);
+        $this->assertIsString($uuid);
+        $this->assertTrue(Str::startsWith($uuid, 'a-'));
+        $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+        $uuid = \Common::generateConfirmationUrlToken(15);
+        $this->assertIsString($uuid);
+        $this->assertTrue(Str::startsWith($uuid, 'f-'));
+        $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+        $uuid = \Common::generateConfirmationUrlToken(16);
+        $this->assertIsString($uuid);
+        $this->assertTrue(Str::startsWith($uuid, '10-'));
+        $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+    }
 }
