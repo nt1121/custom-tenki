@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Services\WeatherForecastService;
 use App\Services\AreaGroupService;
+use App\Services\EmailChangeService;
 use Tests\CreatesApplication;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -14,6 +15,7 @@ use App\Models\UserWeatherForecastItem;
 use App\Models\WeatherForecastItem;
 use App\Models\Area;
 use App\Models\AreaGroup;
+use App\Models\EmailChangeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,6 +31,7 @@ class UnitTest extends TestCase
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         User::truncate();
         UserWeatherForecastItem::truncate();
+        EmailChangeRequest::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
@@ -38,6 +41,7 @@ class UnitTest extends TestCase
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         User::truncate();
         UserWeatherForecastItem::truncate();
+        EmailChangeRequest::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
@@ -130,7 +134,7 @@ class UnitTest extends TestCase
         // テストのためのユーザーを作成する
         try {
             DB::beginTransaction();
-            $user = User::create(['email' => config('const.system_admin_email_address'), 'password' => Hash::make('testtest')]);
+            $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
             $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop', 'rain_3h', 'humidity', 'wind'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
             $displayOrder = 0;
 
@@ -183,12 +187,12 @@ class UnitTest extends TestCase
      */
     public function test_area_group_service(): void
     {
+        // getAreaGroupAndChildrenのテスト
+
         $areaGroupService = app()->make(AreaGroupService::class);
 
         // キャッシュからデータが取得されるかテストする
 
-        // テストのためにキャッシュのキーを変更
-        Config::set('const.area_group_and_children_cache_key', 'test_area_group_and_children_area_group_id_');
         $cacheKey = config('const.area_group_and_children_cache_key') . 'null';
         $data = ['area_group_and_children_test_' . Str::uuid()];
         Cache::put($cacheKey, $data, 3600);
@@ -225,5 +229,29 @@ class UnitTest extends TestCase
         // 引数が存在しない地域グループIDの場合
 
         $this->assertFalse($areaGroupService->getAreaGroupAndChildren(99999999));
+    }
+
+    /**
+     * EmailChangeServiceの各メソッドの単体テスト
+     */
+    public function test_email_change_service(): void
+    {
+        // createRequestのテスト
+
+        $emailChangeService = app()->make(EmailChangeService::class);
+        $user = User::where('email', config('const.test_user_email1'))->first();
+
+        if (empty($user)) {
+            $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+        }
+
+        $emailChangeRequest = $emailChangeService->createRequest($user->id, config('const.test_user_email2'));
+        $this->assertTrue($emailChangeRequest instanceof EmailChangeRequest);
+        $this->assertSame($user->id, $emailChangeRequest->user_id);
+        $this->assertSame(config('const.test_user_email2'), $emailChangeRequest->email);
+        $this->assertTrue(Str::startsWith($emailChangeRequest->token, dechex($user->id) . '-'));
+        $emailChangeRequest->delete();
+
+        $this->assertFalse($emailChangeService->createRequest(-1, config('const.test_user_email2')));
     }
 }
