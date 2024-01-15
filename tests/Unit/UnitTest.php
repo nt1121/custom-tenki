@@ -239,19 +239,27 @@ class UnitTest extends TestCase
         // createRequestのテスト
 
         $emailChangeService = app()->make(EmailChangeService::class);
-        $user = User::where('email', config('const.test_user_email1'))->first();
+        $user1 = User::where('email', config('const.test_user_email1'))->first();
 
-        if (empty($user)) {
-            $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+        if (empty($user1)) {
+            $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
         }
 
-        $emailChangeRequest = $emailChangeService->createRequest($user->id, config('const.test_user_email2'));
+        $emailChangeRequest = $emailChangeService->createRequest($user1->id, config('const.test_user_email2'));
         $this->assertTrue($emailChangeRequest instanceof EmailChangeRequest);
-        $this->assertSame($user->id, $emailChangeRequest->user_id);
+        $this->assertSame($user1->id, $emailChangeRequest->user_id);
         $this->assertSame(config('const.test_user_email2'), $emailChangeRequest->email);
-        $this->assertTrue(Str::startsWith($emailChangeRequest->token, dechex($user->id) . '-'));
-        $emailChangeRequest->delete();
-
+        $this->assertTrue(Str::startsWith($emailChangeRequest->token, dechex($user1->id) . '-'));
         $this->assertFalse($emailChangeService->createRequest(-1, config('const.test_user_email2')));
+
+        // changeUserEmailのテスト
+
+        $emailChangeRequestId = $emailChangeRequest->id;
+        $newEmail = $emailChangeRequest->email;
+        $user1 = $emailChangeService->changeUserEmail($user1, $emailChangeRequest->email, $emailChangeRequest->id);
+        $this->assertSame($newEmail, $user1->email);
+        $this->assertNull(EmailChangeRequest::find($emailChangeRequestId));
+        $user2 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+        $this->assertFalse($emailChangeService->changeUserEmail($user2, config('const.test_user_email2'), $emailChangeRequestId));
     }
 }
