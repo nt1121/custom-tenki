@@ -46,7 +46,8 @@ class UnitTest extends TestCase
     {
         $weatherForecastService = app()->make(WeatherForecastService::class);
 
-        // convertWindDegToText
+        // convertWindDegToTextのテスト
+
         $this->assertSame('北', $weatherForecastService->convertWindDegToText(0));
         $this->assertSame('北', $weatherForecastService->convertWindDegToText(11));
         $this->assertSame('北北東', $weatherForecastService->convertWindDegToText(12));
@@ -82,7 +83,8 @@ class UnitTest extends TestCase
         $this->assertSame('北', $weatherForecastService->convertWindDegToText(349));
         $this->assertSame('北', $weatherForecastService->convertWindDegToText(360));
 
-        // getDayOfWeekText
+        // getDayOfWeekTextのテスト
+
         $this->assertSame('', $weatherForecastService->getDayOfWeekText(-1));
         $this->assertSame('（日）', $weatherForecastService->getDayOfWeekText(0));
         $this->assertSame('（月）', $weatherForecastService->getDayOfWeekText(1));
@@ -93,19 +95,20 @@ class UnitTest extends TestCase
         $this->assertSame('（土）', $weatherForecastService->getDayOfWeekText(6));
         $this->assertSame('', $weatherForecastService->getDayOfWeekText(7));
 
+        // getThreeHourForecastDataFromCacheとmakeRequestToThreeHourForecastApiのテスト
+
         Cache::flush(); // キャッシュ全体をクリア
-
         $area = Area::find(1);
-
+        // キャッシュに保存されていない場合はNULLが返ってくることを確認
         $this->assertNull($weatherForecastService->getThreeHourForecastDataFromCache($area->id));
-
+        // リクエスト回数の制限を１分間に１回に変更する
         Config::set('const.weather_api.three_hour_forecast.max_requests_per_minute', 1);
-
         $apiResponse = $weatherForecastService->makeRequestToThreeHourForecastApi($area->id, $area->latitude, $area->longitude);
-
         $this->assertIsArray($apiResponse);
+        // キャッシュに保存されている場合は配列が返ってくることを確認
         $this->assertIsArray($weatherForecastService->getThreeHourForecastDataFromCache($area->id));
 
+        // １分間に１回のリクエスト回数制限を超えた場合にステータスコード429のHttpExceptionがスローされることを確認
         try {
             $result = $weatherForecastService->makeRequestToThreeHourForecastApi($area->id, $area->latitude, $area->longitude);
             $this->assertTrue(false);
@@ -113,6 +116,16 @@ class UnitTest extends TestCase
             $this->assertSame(429, $e->getStatusCode());
         }
 
+        // createThreeHourForecastDataForDisplayのテスト
+
+        // リクエスト回数の制限を１分間に２０回に変更する
+        Config::set('const.weather_api.three_hour_forecast.max_requests_per_minute', 20);
+        // ３時間天気予報APIのエンドポイントを空のJSONを返すAPIに変える
+        Config::set('const.weather_api.three_hour_forecast.endpoint', config('app.url') . '/api/test');
+        // APIが空のJSONを返した場合はfalseを返すことを確認
+        $this->assertFalse($weatherForecastService->makeRequestToThreeHourForecastApi($area->id, $area->latitude, $area->longitude));
+
+        // テストのためのユーザーを作成する
         try {
             DB::beginTransaction();
             $user = User::create(['email' => config('const.system_admin_email_address'), 'password' => Hash::make('testtest')]);
