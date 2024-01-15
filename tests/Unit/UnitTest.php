@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\WeatherForecastService;
+use App\Services\AreaGroupService;
 use Tests\CreatesApplication;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -12,6 +13,7 @@ use App\Models\User;
 use App\Models\UserWeatherForecastItem;
 use App\Models\WeatherForecastItem;
 use App\Models\Area;
+use App\Models\AreaGroup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -174,5 +176,54 @@ class UnitTest extends TestCase
                 }
             }
         }
+    }
+
+    /**
+     * AreaGroupServiceの各メソッドのテスト
+     */
+    public function test_area_group_service(): void
+    {
+        $areaGroupService = app()->make(AreaGroupService::class);
+
+        // キャッシュからデータが取得されるかテストする
+
+        // テストのためにキャッシュのキーを変更
+        Config::set('const.area_group_and_children_cache_key', 'test_area_group_and_children_area_group_id_');
+        $cacheKey = config('const.area_group_and_children_cache_key') . 'null';
+        $data = ['area_group_and_children_test_' . Str::uuid()];
+        Cache::put($cacheKey, $data, 3600);
+        $dataFromCache = $areaGroupService->getAreaGroupAndChildren(null);
+        $this->assertSame($data, $dataFromCache);
+
+        Cache::flush(); // キャッシュ全体をクリア
+
+        // 引数がnullの場合（最上位の地域グループの場合）
+
+        $data = $areaGroupService->getAreaGroupAndChildren(null);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('name', $data);
+        $this->assertArrayHasKey('parent_area_group_id', $data);
+        $this->assertArrayHasKey('children', $data);
+        $this->assertNull($data['id']);
+        $this->assertNull($data['name']);
+        $this->assertNull($data['parent_area_group_id']);
+
+        // 引数が存在する地域グループIDの場合
+
+        $areaGroup = AreaGroup::find(1);
+        $data = $areaGroupService->getAreaGroupAndChildren($areaGroup->id);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('name', $data);
+        $this->assertArrayHasKey('parent_area_group_id', $data);
+        $this->assertArrayHasKey('children', $data);
+        $this->assertSame($areaGroup->id, $data['id']);
+        $this->assertSame($areaGroup->name, $data['name']);
+        $this->assertSame($areaGroup->parent_area_group_id, $data['parent_area_group_id']);
+
+        // 引数が存在しない地域グループIDの場合
+
+        $this->assertFalse($areaGroupService->getAreaGroupAndChildren(99999999));
     }
 }

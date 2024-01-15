@@ -12,4 +12,5 @@ return [
     ],
     'system_admin_email_address' => env('SYSTEM_ADMIN_EMAIL_ADDRESS'),
     'test_user_login_enabled' => env('TEST_USER_LOGIN_ENABLED', false),
+    'area_group_and_children_cache_key' => 'area_group_and_children_area_group_id_',
 ];
