@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -52,7 +53,7 @@ class RegisterController extends Controller
      * @param  stirng $token　確認URLのトークン
      * @return Illuminate\View\View
      */
-    public function complete(string $token): View
+    public function complete(string $token, Request $request): View
     {
         $userRegisterToken = UserRegisterToken::where('token', $token)->where('expires_at', '>=', date('Y-m-d H:i:s'))->first();
 
@@ -70,6 +71,8 @@ class RegisterController extends Controller
             return view('register.fail');
         }
 
+        Auth::login($user);
+        $request->session()->regenerate();
         return view('register.complete');
     }
 }

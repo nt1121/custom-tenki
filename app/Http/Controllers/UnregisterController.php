@@ -50,6 +50,9 @@ class UnregisterController extends Controller
             return back()->with('alert', ['msg' => 'アカウントの削除に失敗しました。', 'type' => 'error']);
         }
 
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return view('unregister.complete');
     }
 }

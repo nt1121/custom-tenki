@@ -81,8 +81,6 @@ END;
             return false;
         }
 
-        Auth::login($user);
-        request()->session()->regenerate();
         return $user;
     }
 
@@ -162,9 +160,6 @@ END;
             return false;
         }
 
-        Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
         return true;
     }
 }

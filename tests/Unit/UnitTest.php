@@ -3,22 +3,32 @@
 namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+
+use Tests\CreatesApplication;
+
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
 use App\Services\WeatherForecastService;
 use App\Services\AreaGroupService;
 use App\Services\EmailChangeService;
-use Tests\CreatesApplication;
-use Illuminate\Support\Facades\Config;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Support\Facades\Cache;
+use App\Services\PasswordResetService;
+use App\Services\UserService;
+
 use App\Models\User;
 use App\Models\UserWeatherForecastItem;
 use App\Models\WeatherForecastItem;
 use App\Models\Area;
 use App\Models\AreaGroup;
 use App\Models\EmailChangeRequest;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use App\Models\PasswordResetRequest;
+use App\Models\UserRegisterToken;
 
 class UnitTest extends TestCase
 {
@@ -134,7 +144,7 @@ class UnitTest extends TestCase
         // テストのためのユーザーを作成する
         try {
             DB::beginTransaction();
-            $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+            $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
             $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop', 'rain_3h', 'humidity', 'wind'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
             $displayOrder = 0;
 
@@ -242,7 +252,7 @@ class UnitTest extends TestCase
         $user1 = User::where('email', config('const.test_user_email1'))->first();
 
         if (empty($user1)) {
-            $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+            $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         }
 
         $emailChangeRequest = $emailChangeService->createRequest($user1->id, config('const.test_user_email2'));
@@ -259,7 +269,7 @@ class UnitTest extends TestCase
         $user1 = $emailChangeService->changeUserEmail($user1, $emailChangeRequest->email, $emailChangeRequest->id);
         $this->assertSame($newEmail, $user1->email);
         $this->assertNull(EmailChangeRequest::find($emailChangeRequestId));
-        $user2 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('testtest')]);
+        $user2 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $this->assertFalse($emailChangeService->changeUserEmail($user2, config('const.test_user_email2'), $emailChangeRequestId));
     }
 
@@ -288,5 +298,119 @@ class UnitTest extends TestCase
         $this->assertIsString($uuid);
         $this->assertTrue(Str::startsWith($uuid, '10-'));
         $this->assertTrue(!!preg_match('/\A[0-9a-z\-]+\z/', $uuid));
+    }
+
+    /**
+     * PasswordResetServiceの各メソッドの単体テスト
+     */
+    public function test_password_reset_service(): void
+    {
+        $passwordResetService = app()->make(PasswordResetService::class);
+
+        // createRequestのテスト
+
+        $user = User::where('email', config('const.test_user_email1'))->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
+        $passwordResetRequest = $passwordResetService->createRequest($user->id, $user->email);
+        $this->assertTrue($passwordResetRequest instanceof PasswordResetRequest);
+        $this->assertSame($user->id, $passwordResetRequest->user_id);
+        $this->assertTrue(Str::startsWith($passwordResetRequest->token, dechex($user->id) . '-'));
+        $this->assertFalse($passwordResetService->createRequest(-1, config('const.test_user_email1')));
+
+        // resetのテスト
+
+        $passwordResetRequestId = $passwordResetRequest->id;
+        $newPassword = 'newpassword';
+        $user = $passwordResetService->reset($user, $newPassword, $passwordResetRequest->id);
+        $this->assertTrue($user instanceof User);
+        $this->assertTrue(password_verify($newPassword, $user->password));
+        $this->assertNull(PasswordResetRequest::find($passwordResetRequestId));
+    }
+
+    /**
+     * UserServiceの各メソッドの単体テスト
+     */
+    public function test_user_service(): void
+    {
+        $userService = app()->make(UserService::class);
+
+        // registerのテスト
+
+        $user = User::where('email', config('const.test_user_email1'))->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        $password = 'test1234';
+        $user = $userService->register(config('const.test_user_email1'), $password);
+        $this->assertTrue($user instanceof User);
+        $this->assertSame(config('const.test_user_email1'), $user->email);
+        $this->assertTrue(password_verify($password, $user->password));
+        $userRegisterToken = UserRegisterToken::where('user_id', $user->id)->first();
+        $this->assertNotNull($userRegisterToken);
+        $this->assertTrue(Str::startsWith($userRegisterToken->token, dechex($user->id) . '-'));
+
+        // completeRegistrationのテスト
+        
+        $userRegisterTokenId = $userRegisterToken->id;
+        $user = $userService->completeRegistration($user, $userRegisterTokenId);
+        $this->assertTrue($user instanceof User);
+        $weatherForecastItems = $user->weatherForecastItems;
+        $this->assertSame(3, $weatherForecastItems->count());
+        $weather = $weatherForecastItems->where('name', 'weather')->first();
+        $this->assertNotNull($weather->id);
+        $temp = $weatherForecastItems->where('name', 'temp')->first();
+        $this->assertNotNull($temp->id);
+        $pop = $weatherForecastItems->where('name', 'pop')->first();
+        $this->assertNotNull($pop->id);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertNull(UserRegisterToken::find($userRegisterTokenId));
+
+        // getUserStoreStateのテスト
+
+        $result = $userService->getUserStoreState($user);
+        $this->assertIsArray($result);
+        $this->assertSame($user->id, $result['id']);
+        $this->assertSame($user->email, $result['email']);
+        $this->assertSame($user->is_test_user, $result['is_test_user']);
+        $this->assertSame($user->area_id, $result['area_id']);
+        $this->assertNull($result['area_name']);
+        $areaId = 1;
+        $user->area_id = $areaId;
+        $user->save();
+        $area = Area::find($areaId);
+        $result = $userService->getUserStoreState($user);
+        $this->assertIsArray($result);
+        $this->assertSame($user->id, $result['id']);
+        $this->assertSame($user->email, $result['email']);
+        $this->assertSame($user->is_test_user, $result['is_test_user']);
+        $this->assertSame($user->area_id, $result['area_id']);
+        $this->assertSame($area->name, $result['area_name']);
+
+        // updateAreaIdのテスト
+
+        $newAreaId = 2;
+        $user = $userService->updateAreaId($user, $newAreaId);
+        $this->assertTrue($user instanceof User);
+        $this->assertSame($newAreaId, $user->area_id);
+
+        // updatePasswordのテスト
+
+        $newPassword = 'newpassword';
+        $user = $userService->updatePassword($user, $newPassword);
+        $this->assertTrue($user instanceof User);
+        $this->assertTrue(password_verify($newPassword, $user->password));
+
+        // unregisterのテスト
+
+        $userId = $user->id;
+        $this->assertTrue($userService->unregister($user->id, $user->email));
+        $this->assertNull(User::find($userId));
     }
 }
