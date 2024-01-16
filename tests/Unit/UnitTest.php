@@ -20,6 +20,8 @@ use App\Services\AreaGroupService;
 use App\Services\EmailChangeService;
 use App\Services\PasswordResetService;
 use App\Services\UserService;
+use App\Services\UserWeatherForecastItemService;
+use App\Services\WeatherForecastItemService;
 
 use App\Models\User;
 use App\Models\UserWeatherForecastItem;
@@ -114,7 +116,7 @@ class UnitTest extends TestCase
         // getThreeHourForecastDataFromCacheとmakeRequestToThreeHourForecastApiのテスト
 
         Cache::flush(); // キャッシュ全体をクリア
-        $area = Area::find(1);
+        $area = Area::orderBy('id', 'asc')->first();
         // キャッシュに保存されていない場合はNULLが返ってくることを確認
         $this->assertNull($weatherForecastService->getThreeHourForecastDataFromCache($area->id));
         // リクエスト回数の制限を１分間に１回に変更する
@@ -225,7 +227,7 @@ class UnitTest extends TestCase
 
         // 引数が存在する地域グループIDの場合
 
-        $areaGroup = AreaGroup::find(1);
+        $areaGroup = AreaGroup::orderBy('id', 'asc')->first();
         $data = $areaGroupService->getAreaGroupAndChildren($areaGroup->id);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('id', $data);
@@ -412,5 +414,83 @@ class UnitTest extends TestCase
         $userId = $user->id;
         $this->assertTrue($userService->unregister($user->id, $user->email));
         $this->assertNull(User::find($userId));
+    }
+
+    /**
+     * UserWeatherForecastItemServiceの各メソッドの単体テスト
+     */
+    public function test_user_weather_forecast_item_service(): void
+    {
+        $userWeatherForecastItemService = app()->make(UserWeatherForecastItemService::class);
+
+        // updateWeatherForecastItemsToDisplayのテスト
+
+        $user = User::where('email', config('const.test_user_email1'))->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        $password = 'test1234';
+        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make($password)]);
+        $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
+        $displayOrder = 0;
+
+        foreach ($itemIds as $itemId) {
+            $displayOrder++;
+            UserWeatherForecastItem::create(['user_id' => $user->id, 'weather_forecast_item_id' => $itemId, 'display_order' => $displayOrder]);
+        }
+
+        $newItemIds = WeatherForecastItem::whereIn('name', ['rain_3h', 'humidity', 'wind'])->orderBy('id', 'desc')->get()->pluck('id')->all();
+        $expected = ['user_weather_forecast_item' => []];
+        $displayOrder = 0;
+
+        foreach ($newItemIds as $itemId) {
+            $displayOrder++;
+            $expected['user_weather_forecast_item'][] = [
+                'user_id' => $user->id,
+                'weather_forecast_item_id' => $itemId,
+                'display_order' => $displayOrder,
+            ];
+        }
+
+        $result = $userWeatherForecastItemService->updateWeatherForecastItemsToDisplay($user->id, $newItemIds);
+        $this->assertSame($expected, $result);
+        $userWeatherForecastItems = UserWeatherForecastItem::where('user_id', $user->id)->orderBy('display_order', 'asc')->get()->toArray();
+        $this->assertSame($expected, ['user_weather_forecast_item' => $userWeatherForecastItems]);
+    }
+
+    /**
+     * WeatherForecastItemServiceの各メソッドの単体テスト
+     */
+    public function test_weather_forecast_item_service(): void
+    {
+        $weatherForecastItemService = app()->make(WeatherForecastItemService::class);
+        $itemsToDisplay = WeatherForecastItem::select('id', 'name', 'display_name')->whereIn('name', ['weather', 'temp'])->orderBy('display_order', 'asc')->get()->toArray();
+        $itemsNotToDisplay = WeatherForecastItem::select('id', 'name', 'display_name')->whereNotIn('name', ['weather', 'temp'])->orderBy('display_order', 'asc')->get()->toArray();
+        $allItems = WeatherForecastItem::select('id', 'name', 'display_name')->orderBy('display_order', 'asc')->get()->toArray();
+        $user = User::where('email', config('const.test_user_email1'))->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        $password = 'test1234';
+        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make($password)]);
+        $displayOrder = 0;
+
+        foreach ($itemsToDisplay as $item) {
+            $displayOrder++;
+            UserWeatherForecastItem::create(['user_id' => $user->id, 'weather_forecast_item_id' => $item['id'], 'display_order' => $displayOrder]);
+        }
+
+        $items = $weatherForecastItemService->getWeatherForecastItemsToDisplayByUser($user);
+        $this->assertSame($itemsToDisplay, $items);
+        $items = $weatherForecastItemService->getWeatherForecastItemsToHideByUser($user);
+        $this->assertSame($itemsNotToDisplay, $items);
+        DB::table('user_weather_forecast_item')->where('user_id', $user->id)->delete();
+        $user->refresh();
+        $items = $weatherForecastItemService->getWeatherForecastItemsToHideByUser($user);
+        $this->assertSame($allItems, $items);
     }
 }
