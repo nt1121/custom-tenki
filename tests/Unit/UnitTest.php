@@ -2,16 +2,13 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-
-use Tests\CreatesApplication;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -34,27 +31,26 @@ use App\Models\UserRegisterToken;
 
 class UnitTest extends TestCase
 {
-    use CreatesApplication;
-
     public function setUp(): void
     {
         parent::setUp();
         $this->createApplication();
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $this->seed(); // シーダーの実行
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 外部キー制約を無効にする
         User::truncate();
         UserWeatherForecastItem::truncate();
         EmailChangeRequest::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 外部キー制約を有効にする
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 外部キー制約を無効にする
         User::truncate();
         UserWeatherForecastItem::truncate();
         EmailChangeRequest::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 外部キー制約を有効にする
     }
 
     /**
@@ -162,6 +158,8 @@ class UnitTest extends TestCase
             $this->assertTrue(false);
         }
 
+        // 時刻、天気アイコン、気温、降水確率、降水量、湿度、風向風速の順になっていることを確認する
+
         $dataForDisplay = $weatherForecastService->createThreeHourForecastDataForDisplay($user, $apiResponse);
         $this->assertIsArray($dataForDisplay);
 
@@ -213,7 +211,7 @@ class UnitTest extends TestCase
 
         Cache::flush(); // キャッシュ全体をクリア
 
-        // 引数がnullの場合（最上位の地域グループの場合）
+        // 引数がnullの場合（最上位の地域グループの場合）にid、name、parent_area_group_idがNULLであることを確認する
 
         $data = $areaGroupService->getAreaGroupAndChildren(null);
         $this->assertIsArray($data);
@@ -225,7 +223,7 @@ class UnitTest extends TestCase
         $this->assertNull($data['name']);
         $this->assertNull($data['parent_area_group_id']);
 
-        // 引数が存在する地域グループIDの場合
+        // 引数が存在する地域グループIDの場合にid、name、parent_area_group_idがNULLではないことを確認する
 
         $areaGroup = AreaGroup::orderBy('id', 'asc')->first();
         $data = $areaGroupService->getAreaGroupAndChildren($areaGroup->id);
@@ -238,7 +236,7 @@ class UnitTest extends TestCase
         $this->assertSame($areaGroup->name, $data['name']);
         $this->assertSame($areaGroup->parent_area_group_id, $data['parent_area_group_id']);
 
-        // 引数が存在しない地域グループIDの場合
+        // 引数が存在しない地域グループIDの場合はfalseを返すことを確認する
 
         $this->assertFalse($areaGroupService->getAreaGroupAndChildren(99999999));
     }
@@ -248,31 +246,31 @@ class UnitTest extends TestCase
      */
     public function test_email_change_service(): void
     {
-        // createRequestのテスト
-
         $emailChangeService = app()->make(EmailChangeService::class);
-        $user1 = User::where('email', config('const.test_user_email1'))->first();
 
-        if (empty($user1)) {
-            $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
-        }
+        // createRequestのテスト
+        
+        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
 
+        // 登録されることを確認する
+        $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $emailChangeRequest = $emailChangeService->createRequest($user1->id, config('const.test_user_email2'));
         $this->assertTrue($emailChangeRequest instanceof EmailChangeRequest);
         $this->assertSame($user1->id, $emailChangeRequest->user_id);
         $this->assertSame(config('const.test_user_email2'), $emailChangeRequest->email);
         $this->assertTrue(Str::startsWith($emailChangeRequest->token, dechex($user1->id) . '-'));
         $this->assertFalse($emailChangeService->createRequest(-1, config('const.test_user_email2')));
+        $this->assertModelExists($emailChangeRequest);
 
         // changeUserEmailのテスト
 
-        $emailChangeRequestId = $emailChangeRequest->id;
-        $newEmail = $emailChangeRequest->email;
+        // ユーザーのメールアドレスが更新され、EmailChangeRequestが削除されることを確認する
         $user1 = $emailChangeService->changeUserEmail($user1, $emailChangeRequest->email, $emailChangeRequest->id);
-        $this->assertSame($newEmail, $user1->email);
-        $this->assertNull(EmailChangeRequest::find($emailChangeRequestId));
+        $this->assertSame($emailChangeRequest->email, $user1->email);
+        $this->assertNull(EmailChangeRequest::find($emailChangeRequest->id));
         $user2 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
-        $this->assertFalse($emailChangeService->changeUserEmail($user2, config('const.test_user_email2'), $emailChangeRequestId));
+        // データベースのエラー（一意制約違反）が発生した場合はfalseを返すことを確認する
+        $this->assertFalse($emailChangeService->changeUserEmail($user2, config('const.test_user_email2'), $emailChangeRequest->id));
     }
 
     /**
@@ -311,27 +309,25 @@ class UnitTest extends TestCase
 
         // createRequestのテスト
 
-        $user = User::where('email', config('const.test_user_email1'))->first();
-
-        if ($user) {
-            $user->delete();
-        }
-
+        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
+        // 登録されることを確認する
         $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $passwordResetRequest = $passwordResetService->createRequest($user->id, $user->email);
         $this->assertTrue($passwordResetRequest instanceof PasswordResetRequest);
         $this->assertSame($user->id, $passwordResetRequest->user_id);
         $this->assertTrue(Str::startsWith($passwordResetRequest->token, dechex($user->id) . '-'));
+        $this->assertModelExists($passwordResetRequest);
+        // データベースのエラー（unsigned integerのカラムに-1を登録しようとする）が発生した場合はfalseを返すことを確認する
         $this->assertFalse($passwordResetService->createRequest(-1, config('const.test_user_email1')));
 
         // resetのテスト
 
-        $passwordResetRequestId = $passwordResetRequest->id;
+        // パスワードが変更され、PasswordResetRequestが削除されることを確認する
         $newPassword = 'newpassword';
         $user = $passwordResetService->reset($user, $newPassword, $passwordResetRequest->id);
         $this->assertTrue($user instanceof User);
         $this->assertTrue(password_verify($newPassword, $user->password));
-        $this->assertNull(PasswordResetRequest::find($passwordResetRequestId));
+        $this->assertNull(PasswordResetRequest::find($passwordResetRequest->id));
     }
 
     /**
@@ -343,25 +339,22 @@ class UnitTest extends TestCase
 
         // registerのテスト
 
-        $user = User::where('email', config('const.test_user_email1'))->first();
-
-        if ($user) {
-            $user->delete();
-        }
-
+        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
+        // UserとUserRegisterTokenが登録されることを確認する
         $password = 'test1234';
         $user = $userService->register(config('const.test_user_email1'), $password);
         $this->assertTrue($user instanceof User);
         $this->assertSame(config('const.test_user_email1'), $user->email);
         $this->assertTrue(password_verify($password, $user->password));
+        $this->assertModelExists($user);
         $userRegisterToken = UserRegisterToken::where('user_id', $user->id)->first();
         $this->assertNotNull($userRegisterToken);
         $this->assertTrue(Str::startsWith($userRegisterToken->token, dechex($user->id) . '-'));
 
         // completeRegistrationのテスト
         
-        $userRegisterTokenId = $userRegisterToken->id;
-        $user = $userService->completeRegistration($user, $userRegisterTokenId);
+        // email_verified_atが更新され、天気、気温、降水確率が表示設定になり、UserRegisterTokenが削除されることを確認する
+        $user = $userService->completeRegistration($user, $userRegisterToken->id);
         $this->assertTrue($user instanceof User);
         $weatherForecastItems = $user->weatherForecastItems;
         $this->assertSame(3, $weatherForecastItems->count());
@@ -372,10 +365,11 @@ class UnitTest extends TestCase
         $pop = $weatherForecastItems->where('name', 'pop')->first();
         $this->assertNotNull($pop->id);
         $this->assertNotNull($user->email_verified_at);
-        $this->assertNull(UserRegisterToken::find($userRegisterTokenId));
+        $this->assertNull(UserRegisterToken::find($userRegisterToken->id));
 
         // getUserStoreStateのテスト
 
+        // 地域が設定されていない場合はarea_nameがnullになることを確認する
         $result = $userService->getUserStoreState($user);
         $this->assertIsArray($result);
         $this->assertSame($user->id, $result['id']);
@@ -383,27 +377,29 @@ class UnitTest extends TestCase
         $this->assertSame($user->is_test_user, $result['is_test_user']);
         $this->assertSame($user->area_id, $result['area_id']);
         $this->assertNull($result['area_name']);
-        $areaId = 1;
-        $user->area_id = $areaId;
+        // 地域が設定されていない場合はarea_nameがnullになることを確認する
+        $area1 = Area::orderBy('id', 'asc')->first(); // ID昇順で1件目の地域を取得
+        $user->area_id = $area1->id;
         $user->save();
-        $area = Area::find($areaId);
         $result = $userService->getUserStoreState($user);
         $this->assertIsArray($result);
         $this->assertSame($user->id, $result['id']);
         $this->assertSame($user->email, $result['email']);
         $this->assertSame($user->is_test_user, $result['is_test_user']);
         $this->assertSame($user->area_id, $result['area_id']);
-        $this->assertSame($area->name, $result['area_name']);
+        $this->assertSame($area1->name, $result['area_name']);
 
         // updateAreaIdのテスト
 
-        $newAreaId = 2;
-        $user = $userService->updateAreaId($user, $newAreaId);
+        // users.area_idが更新されることを確認する
+        $area2 = Area::where('id', '<>', $area1->id)->orderBy('id', 'asc')->first(); // 別の地域を取得
+        $user = $userService->updateAreaId($user, $area2->id);
         $this->assertTrue($user instanceof User);
-        $this->assertSame($newAreaId, $user->area_id);
+        $this->assertSame($area2->id, $user->area_id);
 
         // updatePasswordのテスト
 
+        // users.passwordが更新されることを確認する
         $newPassword = 'newpassword';
         $user = $userService->updatePassword($user, $newPassword);
         $this->assertTrue($user instanceof User);
@@ -411,9 +407,9 @@ class UnitTest extends TestCase
 
         // unregisterのテスト
 
-        $userId = $user->id;
+        // usersテーブルからレコードが削除されることを確認する
         $this->assertTrue($userService->unregister($user->id, $user->email));
-        $this->assertNull(User::find($userId));
+        $this->assertNull(User::find($user->id));
     }
 
     /**
@@ -425,14 +421,9 @@ class UnitTest extends TestCase
 
         // updateWeatherForecastItemsToDisplayのテスト
 
-        $user = User::where('email', config('const.test_user_email1'))->first();
-
-        if ($user) {
-            $user->delete();
-        }
-
-        $password = 'test1234';
-        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make($password)]);
+        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
+        // ユーザーを作成し、天気、天気、降水確率を表示設定にする
+        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
         $displayOrder = 0;
 
@@ -441,6 +432,7 @@ class UnitTest extends TestCase
             UserWeatherForecastItem::create(['user_id' => $user->id, 'weather_forecast_item_id' => $itemId, 'display_order' => $displayOrder]);
         }
 
+        // 更新処理後に、降水量、湿度、風向風速が表示設定になることを確認する
         $newItemIds = WeatherForecastItem::whereIn('name', ['rain_3h', 'humidity', 'wind'])->orderBy('id', 'desc')->get()->pluck('id')->all();
         $expected = ['user_weather_forecast_item' => []];
         $displayOrder = 0;
@@ -454,8 +446,10 @@ class UnitTest extends TestCase
             ];
         }
 
+        // 戻り値のチェック
         $result = $userWeatherForecastItemService->updateWeatherForecastItemsToDisplay($user->id, $newItemIds);
         $this->assertSame($expected, $result);
+        // データベースから取得してもう一度チェック
         $userWeatherForecastItems = UserWeatherForecastItem::where('user_id', $user->id)->orderBy('display_order', 'asc')->get()->toArray();
         $this->assertSame($expected, ['user_weather_forecast_item' => $userWeatherForecastItems]);
     }
@@ -466,17 +460,14 @@ class UnitTest extends TestCase
     public function test_weather_forecast_item_service(): void
     {
         $weatherForecastItemService = app()->make(WeatherForecastItemService::class);
+        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
+        // 表示設定にする項目（天気、気温）
         $itemsToDisplay = WeatherForecastItem::select('id', 'name', 'display_name')->whereIn('name', ['weather', 'temp'])->orderBy('display_order', 'asc')->get()->toArray();
+        // 非表示設定にする項目（天気、気温以外）
         $itemsNotToDisplay = WeatherForecastItem::select('id', 'name', 'display_name')->whereNotIn('name', ['weather', 'temp'])->orderBy('display_order', 'asc')->get()->toArray();
+        // すべての項目
         $allItems = WeatherForecastItem::select('id', 'name', 'display_name')->orderBy('display_order', 'asc')->get()->toArray();
-        $user = User::where('email', config('const.test_user_email1'))->first();
-
-        if ($user) {
-            $user->delete();
-        }
-
-        $password = 'test1234';
-        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make($password)]);
+        $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $displayOrder = 0;
 
         foreach ($itemsToDisplay as $item) {
@@ -484,12 +475,16 @@ class UnitTest extends TestCase
             UserWeatherForecastItem::create(['user_id' => $user->id, 'weather_forecast_item_id' => $item['id'], 'display_order' => $displayOrder]);
         }
 
+        // 表示する項目のチェック
         $items = $weatherForecastItemService->getWeatherForecastItemsToDisplayByUser($user);
         $this->assertSame($itemsToDisplay, $items);
+        // 表示しない項目のチェック
         $items = $weatherForecastItemService->getWeatherForecastItemsToHideByUser($user);
         $this->assertSame($itemsNotToDisplay, $items);
+        // 中間テーブルからこのユーザーと項目の紐付けを全て削除する
         DB::table('user_weather_forecast_item')->where('user_id', $user->id)->delete();
         $user->refresh();
+        // 全ての項目が表示しない項目として取得されることを確認する
         $items = $weatherForecastItemService->getWeatherForecastItemsToHideByUser($user);
         $this->assertSame($allItems, $items);
     }

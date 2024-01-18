@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Mail\NotificationMail;
 use App\Models\PasswordResetRequest;
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;

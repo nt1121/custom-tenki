@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
