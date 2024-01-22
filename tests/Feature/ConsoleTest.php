@@ -40,7 +40,6 @@ class ConsoleTest extends TestCase
      */
     public function test_command_delete_members_without_email_authentication(): void
     {
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
         // メール未認証のユーザーが49時間前と47時間前に登録されたことにする
         $createdAt = Carbon::parse('-49 hours')->format('Y-m-d H:i:s');
         $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
@@ -75,8 +74,6 @@ class ConsoleTest extends TestCase
 
     public function test_command_delete_expired_user_register_tokens(): void
     {
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
-        DB::table('user_register_tokens')->delete(); // user_register_tokensテーブルのレコードを全件削除する
         $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $token = \Common::generateConfirmationUrlToken($user1->id);
         $expiresAt = new Carbon('-25 hours');
@@ -97,8 +94,6 @@ class ConsoleTest extends TestCase
 
     public function test_command_delete_expired_password_reset_requests(): void
     {
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
-        DB::table('password_reset_requests')->delete(); // password_reset_requestsテーブルのレコードを全件削除する
         $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $token = \Common::generateConfirmationUrlToken($user1->id);
         $expiresAt = new Carbon('-25 hours');
@@ -119,8 +114,6 @@ class ConsoleTest extends TestCase
 
     public function test_command_delete_expired_email_change_requests(): void
     {
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
-        DB::table('email_change_requests')->delete(); // email_change_requestsテーブルのレコードを全件削除する
         $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $token = \Common::generateConfirmationUrlToken($user->id);
         $expiresAt = new Carbon('-25 hours');

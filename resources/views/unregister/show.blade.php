@@ -11,7 +11,7 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <unregister-form user-id="{{ $loginUserId }}" password-initial-error-msg="{{ $errors->first('password') }}"></register-form>
+                <unregister-form user-id="{{ $loginUserId }}" password-initial-error-msg="{{ isset($errors) ? $errors->first('password') : '' }}"></register-form>
             </div>
         </main>
         @include('include.footer')

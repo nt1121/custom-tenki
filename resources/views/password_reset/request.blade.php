@@ -12,7 +12,7 @@
         <main class="l-main">
             <div class="l-main__inner">
                 <password-reset-request old-email="{{ old('email', '') }}"
-                    email-initial-error-msg="{{ $errors->first('email') }}"></password-reset-request>
+                    email-initial-error-msg="{{ isset($errors) ? $errors->first('email') : '' }}"></password-reset-request>
             </div>
         </main>
         @include('include.footer')

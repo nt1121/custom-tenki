@@ -14,8 +14,8 @@
                 <register-form old-email="{{ old('email', '') }}"
                     :old-agree-to-terms-of-use="{{ old('agree_to_terms_of_use') ? 'true' : 'false' }}"
                     :old-consent-to-privacy-policy="{{ old('consent_to_privacy_policy') ? 'true' : 'false' }}"
-                    email-initial-error-msg="{{ $errors->first('email') }}"
-                    password-initial-error-msg="{{ $errors->first('password') }}"></register-form>
+                    email-initial-error-msg="{{ isset($errors) ? $errors->first('email') : '' }}"
+                    password-initial-error-msg="{{ isset($errors) ? $errors->first('password') : '' }}"></register-form>
             </div>
         </main>
         @include('include.footer')

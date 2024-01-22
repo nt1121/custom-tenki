@@ -11,7 +11,7 @@
         @include('include.hamburger_menu')
         <main class="l-main">
             <div class="l-main__inner">
-                <password-reset password-initial-error-msg="{{ $errors->first('password') }}" token="{{ $token }}"></password-reset>
+                <password-reset password-initial-error-msg="{{ isset($errors) ? $errors->first('password') : '' }}" token="{{ $token }}"></password-reset>
             </div>
         </main>
         @include('include.footer')

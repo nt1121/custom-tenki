@@ -250,8 +250,6 @@ class UnitTest extends TestCase
 
         // createRequestのテスト
         
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
-
         // 登録されることを確認する
         $user1 = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $emailChangeRequest = $emailChangeService->createRequest($user1->id, config('const.test_user_email2'));
@@ -309,7 +307,6 @@ class UnitTest extends TestCase
 
         // createRequestのテスト
 
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
         // 登録されることを確認する
         $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $passwordResetRequest = $passwordResetService->createRequest($user->id, $user->email);
@@ -339,7 +336,6 @@ class UnitTest extends TestCase
 
         // registerのテスト
 
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
         // UserとUserRegisterTokenが登録されることを確認する
         $password = 'test1234';
         $user = $userService->register(config('const.test_user_email1'), $password);
@@ -421,7 +417,6 @@ class UnitTest extends TestCase
 
         // updateWeatherForecastItemsToDisplayのテスト
 
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
         // ユーザーを作成し、天気、天気、降水確率を表示設定にする
         $user = User::create(['email' => config('const.test_user_email1'), 'password' => Hash::make('test1234')]);
         $itemIds = WeatherForecastItem::whereIn('name', ['weather', 'temp', 'pop'])->orderBy('display_order', 'asc')->get()->pluck('id')->toArray();
@@ -460,7 +455,7 @@ class UnitTest extends TestCase
     public function test_weather_forecast_item_service(): void
     {
         $weatherForecastItemService = app()->make(WeatherForecastItemService::class);
-        DB::table('users')->delete(); // usersテーブルのレコードを全件削除する
+
         // 表示設定にする項目（天気、気温）
         $itemsToDisplay = WeatherForecastItem::select('id', 'name', 'display_name')->whereIn('name', ['weather', 'temp'])->orderBy('display_order', 'asc')->get()->toArray();
         // 非表示設定にする項目（天気、気温以外）
