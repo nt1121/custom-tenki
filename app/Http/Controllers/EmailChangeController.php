@@ -30,6 +30,7 @@ class EmailChangeController extends Controller
 
         $user = $emailChangeRequest->user;
 
+        // データベースの外部キー制約があるため、基本的には紐づくユーザーが登録されていないことはありえない
         if (empty($user)) {
             return view('expired_url');
         }

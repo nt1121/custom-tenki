@@ -47,6 +47,7 @@ class PasswordResetController extends Controller
 
         $user = User::where('email', $request->email)->whereNotNull('email_verified_at')->first();
 
+        // データベースの外部キー制約があるため、基本的には紐づくユーザーが登録されていないことはありえない
         if (empty($user)) {
             // メールアドレスが一致する会員がいない場合は成功扱い
             return view('password_reset.request_complete');
@@ -75,6 +76,7 @@ class PasswordResetController extends Controller
 
         $user = $passwordResetRequest->user;
 
+        // データベースの外部キー制約があるため、基本的には紐づくユーザーが登録されていないことはありえない
         if (empty($user)) {
             return view('expired_url');
         }
@@ -112,6 +114,7 @@ class PasswordResetController extends Controller
 
         $user = $passwordResetRequest->user;
 
+        // データベースの外部キー制約があるため、基本的には紐づくユーザーが登録されていないことはありえない
         if (empty($user)) {
             return view('expired_url');
         }

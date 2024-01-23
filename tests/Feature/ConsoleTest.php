@@ -21,15 +21,6 @@ class ConsoleTest extends TestCase
     {
         parent::setUp();
         $this->createApplication();
-        $this->seed(); // シーダーの実行
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 外部キー制約を無効にする
-        User::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 外部キー制約を有効にする
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
         DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 外部キー制約を無効にする
         User::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 外部キー制約を有効にする
