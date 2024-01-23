@@ -124,9 +124,12 @@ class UnitTest extends TestCase
         // リクエスト回数の制限を１分間に２０回に変更する
         Config::set('const.weather_api.three_hour_forecast.max_requests_per_minute', 20);
         // ３時間天気予報APIのエンドポイントを空のJSONを返すAPIに変える
+        $oldApiEndpoint = config('const.weather_api.three_hour_forecast.endpoint');
         Config::set('const.weather_api.three_hour_forecast.endpoint', config('app.url') . '/api/test');
         // APIが空のJSONを返した場合はfalseを返すことを確認
         $this->assertFalse($weatherForecastService->makeRequestToThreeHourForecastApi($area->id, $area->latitude, $area->longitude));
+        // APIのエンドポイントを元に戻す
+        Config::set('const.weather_api.three_hour_forecast.endpoint', $oldApiEndpoint);
 
         // テストのためのユーザーを作成する
         try {

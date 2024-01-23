@@ -36,6 +36,7 @@ class WeatherController extends Controller
 
         $area = $loginUser->area;
 
+        // 外部キー制約があるので、取得できないことは基本的にないはず
         if (!$area) {
             return response()->json([
                 'status' => 404,
