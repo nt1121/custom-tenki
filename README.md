@@ -31,7 +31,7 @@ Laravel 10、Vue 3等を使用して作成しました。
 
 ## データベース設計
 
-[ER図](https://ct.nt1121.net/img/er_diagram.png)
+[ER図](https://github.com/nt1121/custom-tenki/blob/main/public/img/er_diagram.png)
 
 ## 動作確認済み環境
 
@@ -108,4 +108,12 @@ chmod -R 777 bootstrap/cache
 
 ```
 * * * * * cd （アプリケーションのルートディレクトリの絶対パスをこちらに設定してください） && php artisan schedule:run >> /dev/null 2>&1
+```
+
+## テスト
+
+サーバーが起動している状態でcustom-tenkiディレクトリにて下記のコマンドを実行することにより、自動テストを実行することができます。
+
+```
+php artisan test
 ```
